@@ -1,17 +1,21 @@
 from rest_framework import generics, permissions
+from organizer_api_prj.permissions import IsOwnerOrReadOnly
 from .models import Team
 from .serializers import TeamSerializer
 
 
 class TeamList(generics.ListCreateAPIView):
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    # TeamList allows user to view teams, or create their own teams
+    # Allow creating teams only to authenticated users
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]    
     serializer_class = TeamSerializer
     queryset = Team.objects.all()
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
-class TeamDetails(generics.RetrieveDestroyAPIView):    
+class TeamDetails(generics.RetrieveUpdateDestroyAPIView): 
+    # TeamDetails allows the user to delete or update their own teams   
     serializer_class = TeamSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [IsOwnerOrReadOnly]
     queryset = Team.objects.all()
