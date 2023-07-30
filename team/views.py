@@ -34,9 +34,9 @@ class TeamMembershipList(generics.ListCreateAPIView):
 
 
 class TeamMembershipDetails(generics.RetrieveDestroyAPIView):
+    # TeamMembershipDetails allows users to leave teams
     serializer_class = TeamMembershipSerializer
     permission_classes = [IsTeamMemberOrReadOnly]
 
     def get_queryset(self):
         return  Membership.objects.all()
-        

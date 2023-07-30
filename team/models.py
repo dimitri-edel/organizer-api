@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 class Team(models.Model):
     owner= models.ForeignKey(User, on_delete=models.CASCADE, related_name="team_owner")
     name= models.CharField(max_length=255, blank=False)
-
+    
 
     class Meta:
         ordering = ['name']
