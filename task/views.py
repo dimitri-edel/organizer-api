@@ -10,4 +10,9 @@ class TaskList(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
-        
+
+
+class TaskDetails(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = TaskSerializer
+    permission_classes = [IsOwnerOrTeamMemberOrReadOnly]
+    queryset=Task.objects.all()
