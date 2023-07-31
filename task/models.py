@@ -11,7 +11,7 @@ class Task(models.Model):
     owner = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="task_owner")
     asigned_to = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="task_asigned_to")
+        User, on_delete=models.CASCADE, null=True ,related_name="task_asigned_to")
     name = models.CharField(max_length=200, blank=False)
     due_date = models.DateTimeField(auto_now_add=True)
     category = models.IntegerField(choices=CATEGORY, default=0)

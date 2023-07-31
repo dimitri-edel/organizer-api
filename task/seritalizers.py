@@ -3,7 +3,7 @@ from .models import *
 
 class TaskSerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.username')
-    file = serializers.ReadOnlyField(source='file.url')
+    # file = serializers.ReadOnlyField(source='file.url')
     asigned_to = serializers.ReadOnlyField(source='asigned_to.username')
     # asigned_to = models.ForeignKey(
     #     Membership.member, on_delete=models.CASCADE, related_name="task_asigned_to")
