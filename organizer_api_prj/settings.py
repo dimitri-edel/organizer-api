@@ -11,6 +11,10 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+import os
+if os.path.exists('organizer_api_prj/env.py'):
+    from .env import *
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,6 +31,12 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# CLOUDINARY
+CLOUDINARY_STORAGE = {
+    'CLOUDINARY_URL': os.environ['CLOUDINARY_URL']
+}
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 # Application definition
 
@@ -50,6 +60,7 @@ INSTALLED_APPS = [
     'dj_rest_auth.registration',
     'corsheaders',
     "team",
+    "task",
 ]
 SITE_ID = 1  # required for dj_rest_auth
 
