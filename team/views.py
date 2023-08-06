@@ -33,6 +33,14 @@ class TeamMembershipList(generics.ListCreateAPIView):
         serializer.save(member=self.request.user)
 
 
+class TeamMates(generics.ListAPIView):
+    # List of all members of all teams owned by the current user
+    serializer_class = TeamMembershipSerializer
+    permission_classes = [IsOwnerOrReadOnly]
+
+    def get_queryset(self):
+        return Membership.objects.filter(team__owner=self.request.user)
+
 class TeamMembershipDetails(generics.RetrieveDestroyAPIView):
     # TeamMembershipDetails allows users to leave teams
     serializer_class = TeamMembershipSerializer

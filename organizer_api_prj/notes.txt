@@ -1,0 +1,4 @@
+storing files in the database would be to time consuming
+storing files in heroku's static folder seems problematic, because they will systematically erase files that are not part of the project
+in other words anything that gets uploaded will be deleted within about five days or so.
+Uploading larger files to cloudinary involves a litle bit more programming, but most of all it costs extra. At least to my understanding.

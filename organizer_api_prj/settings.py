@@ -24,12 +24,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-19o=k^ck(wfs_0z%e7(94+(orh#4kr4=1#(x+b$f2h&+&2b-!6"
+SECRET_KEY = os.environ['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = 'DEV' in os.environ
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1']
 
 # CLOUDINARY
 CLOUDINARY_STORAGE = {
@@ -38,6 +38,41 @@ CLOUDINARY_STORAGE = {
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
+# REST FRAMEWORK
+REST_FRAMEWORK = {
+    # if DEV(eloper-mode) is set, then use session authenticaton
+    # else use JWT-Tokens
+    'DEFAULT_AUTHENTICATION_CLASSES': [(
+        'rest_framework.authentication.SessionAuthentication'
+        if 'DEV' in os.environ
+        else 'dj_rest_auth.jwt_auth.JWTCookieAuthentication'
+    )],  # PAGINATION SETTINGS
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 3,
+    'DATETIME_FORMAT': '%d %b %Y',
+    # use the default user serializer
+    'USER_DETAILS_SERIALIZER': 'dj_rest_auth.serializers.UserDetailsSerializer', 
+}
+
+# Set JSON-Format outside the Developer environment (Turn off the HTML and JavaScript in the views)
+if 'DEV' not in os.environ:
+    REST_FRAMEWORK['DEFAULT_RENDERER_CLASSES'] = [
+        'rest_framework.renderers.JSONRenderer',]
+# enable JWT-Token-based authentication
+REST_USE_JWT = True
+# use JWT-Tokesn over HTTPS-connection only
+JWT_AUTH_SECURE = True
+# Cookie-name for access token
+JWT_AUTH_COOKIE = 'organizer-api-auth'
+# Cookie-name for refresh token
+JWT_AUTH_REFRESH_COOKIE = 'organizer-api-token'
+# To be able to have the front end app and the API deployed to different platforms, 
+# set the JWT_AUTH_SAMESITE attribute to 'None'. Without this the cookies would be blocked
+JWT_AUTH_SAMESITE = 'None'
+# Override default User details serializer for JWT-Tokens
+# REST_AUTH_SERIALIZERS = {
+#     'USER_DETAILS_SERIALIZER': 'DRF_prj.serializers.CurrentUserSerializer'
+# }
 # Application definition
 
 INSTALLED_APPS = [
@@ -101,8 +136,17 @@ WSGI_APPLICATION = "organizer_api_prj.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+
+        'NAME': os.environ['DB_NAME'],
+
+        'USER': os.environ['DB_USER'],
+
+        'PASSWORD': os.environ['DB_PASSWORD'],
+
+        'HOST': os.environ['DB_HOST'],
+
+        'PORT': os.environ['DB_PORT'],
     }
 }
 
