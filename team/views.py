@@ -1,7 +1,8 @@
-from rest_framework import generics, permissions
+from rest_framework import generics, permissions, filters
 from organizer_api_prj.permissions import IsOwnerOrReadOnly, IsTeamMemberOrReadOnly
 from .models import Team, Membership
 from .serializers import TeamSerializer, TeamMembershipSerializer
+from django_filters.rest_framework import DjangoFilterBackend
 
 
 class TeamList(generics.ListCreateAPIView):
@@ -10,6 +11,25 @@ class TeamList(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]    
     serializer_class = TeamSerializer
     queryset = Team.objects.all()
+    filter_backends = [
+        filters.OrderingFilter,
+        filters.SearchFilter,
+        DjangoFilterBackend,
+    ]
+    # fields for SearchFilter
+    search_fields = [
+        'owner__username',
+        'name',
+    ]
+    # fields for OrderingFilter
+    ordering_fields = [
+        'owner__username', 
+    ]
+    # fields for DjangoFilterBackend
+    filterset_fields = [
+        'owner__username',
+        'name',
+    ]
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
