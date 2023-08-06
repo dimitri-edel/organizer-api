@@ -29,7 +29,7 @@ SECRET_KEY = os.environ['SECRET_KEY']
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = 'DEV' in os.environ
 
-ALLOWED_HOSTS = ['127.0.0.1']
+ALLOWED_HOSTS = ['127.0.0.1', 'organizer-api-f1f640e8d82c.herokuapp.com']
 
 # CLOUDINARY
 CLOUDINARY_STORAGE = {
@@ -109,6 +109,13 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+# Allow Request from ...
+if 'CLIENT_ORIGIN' in os.environ:
+     CORS_ALLOWED_ORIGINS = [
+         os.environ.get('CLIENT_ORIGIN')
+     ]
+
+CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = "organizer_api_prj.urls"
 
