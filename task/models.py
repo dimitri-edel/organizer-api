@@ -1,6 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import User
-from team.models import Membership
 from django.core.validators import FileExtensionValidator
 
 CATEGORY = ((0, "Chore"),(1, "Errand"), (2, "Work"))
@@ -13,7 +12,7 @@ class Task(models.Model):
     asigned_to = models.ForeignKey(
         User, on_delete=models.SET_NULL, blank=True, null=True ,related_name="task_asigned_to")
     name = models.CharField(max_length=200, blank=False)
-    due_date = models.DateTimeField(auto_now_add=True)
+    due_date = models.DateTimeField()
     category = models.IntegerField(choices=CATEGORY, default=0)
     priority = models.IntegerField(choices=PRIORITY, default=0)
     status = models.IntegerField(choices=STATUS, default=0)

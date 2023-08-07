@@ -1,4 +1,6 @@
 from rest_framework import generics, filters
+from rest_framework.views import APIView
+from rest_framework.response import Response
 from organizer_api_prj.permissions import IsOwnerOrTeamMemberOrReadOnly
 from rest_framework.permissions import IsAuthenticated
 from .seritalizers import TaskSerializer
@@ -58,3 +60,4 @@ class TaskDetails(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = TaskSerializer
     permission_classes = [IsOwnerOrTeamMemberOrReadOnly]
     queryset=Task.objects.all()
+
