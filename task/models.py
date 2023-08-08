@@ -12,6 +12,7 @@ class Task(models.Model):
     asigned_to = models.ForeignKey(
         User, on_delete=models.SET_NULL, blank=True, null=True ,related_name="task_asigned_to")
     name = models.CharField(max_length=200, blank=False)
+    comment = models.TextField(blank=True, default="")
     due_date = models.DateTimeField()
     category = models.IntegerField(choices=CATEGORY, default=0)
     priority = models.IntegerField(choices=PRIORITY, default=0)
