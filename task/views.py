@@ -21,7 +21,7 @@ class TaskList(generics.ListCreateAPIView):
     # fields for SearchFilter
     search_fields = [
         'owner__username',
-        'name',
+        'title',
         'due_date',
         'category',
         'priority',
