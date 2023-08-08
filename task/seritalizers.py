@@ -10,7 +10,7 @@ class TaskSerializer(serializers.ModelSerializer):
             'id',
             'owner',
             'asigned_to',
-            'name',
+            'title',
             'comment',
             'due_date',
             'category',

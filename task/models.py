@@ -11,7 +11,7 @@ class Task(models.Model):
         User, on_delete=models.CASCADE, related_name="task_owner")
     asigned_to = models.ForeignKey(
         User, on_delete=models.SET_NULL, blank=True, null=True ,related_name="task_asigned_to")
-    name = models.CharField(max_length=200, blank=False)
+    title = models.CharField(max_length=200, blank=False)
     comment = models.TextField(blank=True, default="")
     due_date = models.DateTimeField()
     category = models.IntegerField(choices=CATEGORY, default=0)
