@@ -17,7 +17,7 @@ class Task(models.Model):
     category = models.IntegerField(choices=CATEGORY, default=0)
     priority = models.IntegerField(choices=PRIORITY, default=0)
     status = models.IntegerField(choices=STATUS, default=0)
-    file = models.FileField(upload_to="media/", null=True, validators=[FileExtensionValidator(allowed_extensions=["jpg", "png", "webp", "bmp"])])
+    file = models.FileField(upload_to="media/", null=True, blank=True, validators=[FileExtensionValidator(allowed_extensions=["jpg", "png", "webp", "bmp"])])
 
     class Meta:
         ordering = ['-due_date']
