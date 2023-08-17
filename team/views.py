@@ -65,15 +65,18 @@ class TeamMates(generics.ListAPIView):
     def get_queryset(self):
         return Membership.objects.filter(team__owner=self.request.user)
 
-class TeamMembershipDetails(generics.RetrieveDestroyAPIView):
-    # TeamMembershipDetails allows users to leave teams
-    serializer_class = TeamMembershipSerializer
-    permission_classes = [IsTeamMemberOrReadOnly]
+# class TeamMembershipDetails(generics.RetrieveDestroyAPIView):
+#     # TeamMembershipDetails allows users to leave teams
+#     serializer_class = TeamMembershipSerializer
+#     permission_classes = [IsTeamMemberOrReadOnly]
 
-    def get_queryset(self):
-        return  Membership.objects.all()
+#     def get_queryset(self):
+#         return  Membership.objects.all()
+
 
 class LeaveTeam(APIView):
+    # LeaveTeam allows the user to quit a team membership by providing the team_id in the request
+
     # Attribute of APIView that creates a form for the object
     serializer_class = TeamSerializer
     # Attribute of APIView that allows to manage permissions
