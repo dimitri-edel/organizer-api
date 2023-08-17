@@ -3,6 +3,10 @@ from organizer_api_prj.permissions import IsOwnerOrReadOnly, IsTeamMemberOrReadO
 from .models import Team, Membership
 from .serializers import TeamSerializer, TeamMembershipSerializer
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from django.http import Http404
 
 
 class TeamList(generics.ListCreateAPIView):
@@ -68,3 +72,29 @@ class TeamMembershipDetails(generics.RetrieveDestroyAPIView):
 
     def get_queryset(self):
         return  Membership.objects.all()
+
+class LeaveTeam(APIView):
+    # Attribute of APIView that creates a form for the object
+    serializer_class = TeamSerializer
+    # Attribute of APIView that allows to manage permissions
+    permission_classes = [IsTeamMemberOrReadOnly]
+    
+
+    def get_object(self, team_id):
+    # retrieve the object from the database
+        try:            
+            team = Team.objects.get(id=team_id)
+            membership = Membership.objects.get(member=self.request.user, team=team)
+
+             # Call an method of APIView to check the permissions
+            # If the user does not have permission, the method will
+            # thrwo the 403 Error (Forbidden)
+            self.check_object_permissions(self.request, membership)
+            return membership
+        except Membership.DoesNotExist:
+            raise Http404
+
+    def delete(self, request, team_id):        
+        memebership = self.get_object(team_id)
+        memebership.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
