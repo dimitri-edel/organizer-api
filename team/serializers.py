@@ -5,6 +5,7 @@ from django.db import IntegrityError
 
 class TeamSerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source="owner.username")
+    is_member = serializers.SerializerMethodField()
 
     class Meta:
         model = Team
@@ -12,7 +13,23 @@ class TeamSerializer(serializers.ModelSerializer):
             'id',
             'owner',
             'name',
+            'is_member',
         ]
+
+    def get_is_member(self, obj):
+        # The request object has been passed as a parameter to the constructor
+        # in the views
+        request = self.context['request']
+
+        membership = Membership.objects.get(member=request.user)
+        is_member = False
+        if not membership:
+            is_member = False
+        else:
+            is_member = True
+        # Return True if the user is member of the given team        
+        return is_member
+
 
 
     def create(self, validated_data):
