@@ -21,7 +21,7 @@ class TeamSerializer(serializers.ModelSerializer):
         # in the views
         request = self.context['request']
 
-        membership = Membership.objects.get(team=obj, member=request.user)
+        membership = Membership.objects.filter(team=obj, member=request.user)
         is_member = False
         if not membership:
             is_member = False
