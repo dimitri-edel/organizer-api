@@ -47,7 +47,8 @@ class TeamSerializer(serializers.ModelSerializer):
 class TeamMembershipSerializer(serializers.ModelSerializer):
     user_id = serializers.ReadOnlyField(source="member.id")
     member = serializers.ReadOnlyField(source="member.username")
-    team_id = serializers.ReadOnlyField(source="team.id")    
+    team_id = serializers.ReadOnlyField(source="team.id")  
+    team = serializers.ReadOnlyField(source="team.name")  
 
     class Meta:
         model = Membership
