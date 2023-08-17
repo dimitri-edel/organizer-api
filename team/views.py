@@ -65,13 +65,13 @@ class TeamMates(generics.ListAPIView):
     def get_queryset(self):
         return Membership.objects.filter(team__owner=self.request.user)
 
-# class TeamMembershipDetails(generics.RetrieveDestroyAPIView):
-#     # TeamMembershipDetails allows users to leave teams
-#     serializer_class = TeamMembershipSerializer
-#     permission_classes = [IsTeamMemberOrReadOnly]
+class TeamMembershipDetails(generics.RetrieveDestroyAPIView):
+    # TeamMembershipDetails allows users to leave teams
+    serializer_class = TeamMembershipSerializer
+    permission_classes = [IsTeamMemberOrReadOnly]
 
-#     def get_queryset(self):
-#         return  Membership.objects.all()
+    def get_queryset(self):
+        return  Membership.objects.all()
 
 
 class LeaveTeam(APIView):
