@@ -1,3 +1,8 @@
+""" Function based api views
+    There is a bug in dj-rest-auth that will not logout the user
+    when JWT is enabled. The logout method needs to be
+    declared manually to fix the problem
+ """
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .settings import (
@@ -5,17 +10,19 @@ from .settings import (
     JWT_AUTH_SECURE,
 )
 
+# pylint: disable=W0613
 
 @api_view()
 def root_route(request):
+    """ Return a welcome messeage at the root URL"""
     return Response({
         "message": "Welcome to ORGANIZER-API !"
     })
 
-#dj-rest-auth Bug Fix
-# dj-rest-auth logout view fix
+
 @api_view(['POST'])
 def logout_route(request):
+    """dj-rest-auth logout view Bug Fix"""
     response = Response()
     response.set_cookie(
         key=JWT_AUTH_COOKIE,
@@ -36,4 +43,3 @@ def logout_route(request):
         secure=JWT_AUTH_SECURE,
     )
     return response
-    

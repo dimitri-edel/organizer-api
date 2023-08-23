@@ -1,3 +1,4 @@
+""" URL patterns for team app """
 from django.urls import path
 from team import views
 

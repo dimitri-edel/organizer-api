@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
-
+# pylint: disable=wildcard-import
 from pathlib import Path
 import os
 if os.path.exists('organizer_api_prj/env.py'):
@@ -51,7 +51,7 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 3,
     'DATETIME_FORMAT': '%d %b %Y %H:%M',
     # use the default user serializer
-    'USER_DETAILS_SERIALIZER': 'dj_rest_auth.serializers.UserDetailsSerializer', 
+    'USER_DETAILS_SERIALIZER': 'dj_rest_auth.serializers.UserDetailsSerializer',
 }
 
 # Set JSON-Format outside the Developer environment (Turn off the HTML and JavaScript in the views)
@@ -66,7 +66,7 @@ JWT_AUTH_SECURE = True
 JWT_AUTH_COOKIE = 'organizer-api-auth'
 # Cookie-name for refresh token
 JWT_AUTH_REFRESH_COOKIE = 'organizer-api-token'
-# To be able to have the front end app and the API deployed to different platforms, 
+# To be able to have the front end app and the API deployed to different platforms,
 # set the JWT_AUTH_SAMESITE attribute to 'None'. Without this the cookies would be blocked
 JWT_AUTH_SAMESITE = 'None'
 # Override default User details serializer for JWT-Tokens
@@ -111,10 +111,10 @@ MIDDLEWARE = [
 ]
 # Allow Request from ...
 if 'CLIENT_ORIGIN' in os.environ:
-     CORS_ALLOWED_ORIGINS = [
-         os.environ.get('CLIENT_ORIGIN'),
-         os.environ.get('DEPLOYED_ORIGIN'),
-     ]
+    CORS_ALLOWED_ORIGINS = [
+        os.environ.get('CLIENT_ORIGIN'),
+        os.environ.get('DEPLOYED_ORIGIN'),
+    ]
 
 CORS_ALLOW_CREDENTIALS = True
 
