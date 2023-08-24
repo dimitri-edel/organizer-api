@@ -75,7 +75,7 @@ class TeamMembershipList(generics.ListCreateAPIView):
         serializer.save(member=self.request.user)
 
 
-class TeamMembershipDetails(generics.RetrieveDestroyAPIView):
+class TeamMembershipDetails(generics.RetrieveAPIView):
     """TeamMembershipDetails allows users to leave teams"""
     serializer_class = TeamMembershipSerializer
     permission_classes = [IsTeamMemberOrReadOnly]
@@ -85,7 +85,7 @@ class TeamMembershipDetails(generics.RetrieveDestroyAPIView):
 
 
 class LeaveTeam(APIView):
-    """LeaveTeam allows the user to quit a team membership by providing the team_id in the request"""
+    """LeaveTeam allows the user to quit(delete) a team membership by providing the team_id in the request"""
 
     # Attribute of APIView that creates a form for the object
     serializer_class = TeamSerializer
@@ -101,7 +101,7 @@ class LeaveTeam(APIView):
 
             # Call an method of APIView to check the permissions
             # If the user does not have permission, the method will
-            # thrwo the 403 Error (Forbidden)
+            # throw the 403 Error (Forbidden)
             self.check_object_permissions(self.request, membership)
             return membership
         except Membership.DoesNotExist as exc:
