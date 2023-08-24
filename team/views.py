@@ -12,6 +12,7 @@ from .serializers import TeamSerializer, TeamMembershipSerializer
 # pylint: disable=E1101
 # pylint: disable=unused-argument
 
+
 class TeamList(generics.ListCreateAPIView):
     """ TeamList provides a view for listing teams and a post method for creating teams"""
     # TeamList allows user to view teams, or create their own teams
@@ -62,7 +63,13 @@ class TeamMembershipList(generics.ListCreateAPIView):
     serializer_class = TeamMembershipSerializer
 
     def get_queryset(self):
-        return Membership.objects.exclude(team__owner=self.request.user)
+        # query set where the user is not the owner of the team
+        exclude_user_set = Membership.objects.exclude(
+            team__owner=self.request.user)
+        # A set where the user is the member of the team
+        filtered_set = exclude_user_set.filter(member=self.request.user)
+
+        return filtered_set
 
     def perform_create(self, serializer):
         serializer.save(member=self.request.user)
@@ -107,7 +114,7 @@ class LeaveTeam(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class TeamMates(generics.ListAPIView):    
+class TeamMates(generics.ListAPIView):
     """List of all members of all teams owned by the current user"""
     serializer_class = TeamMembershipSerializer
     permission_classes = [IsOwnerOrReadOnly]
