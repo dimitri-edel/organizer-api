@@ -220,3 +220,89 @@ If the task is not found the **Response** will have the status **400** Bad Reque
 
 #### Delete an existing task by id
 To **delete a task** you need to send a **DELETE-request** to this url **[deployedURL]/task/<int:pk>**
+
+## Deployment
+To deploy this application it is required to set environment variables that it uses:
+### Cloudinary account
+**CLOUDINARY_URL** = 'cloudinary://long-string-of-mumbo-jumbo'
+This variable must be set to carry that URL
+If you register with Cloudinary, you will get a URL that can be used for storing files.
+
+You can use any other storage system, all you need to do is override the **DEFAULT_FILE_STORAGE**
+variable in settings.py. Of course you might have to add another line or two of code to settings.py
+depending on what the storage system requires. For cloudinary it is for instance mandoatory that 
+the cloudanry storage dictionary be added to settings.py. Here is what it looks like in my file:
+<code>
+CLOUDINARY_STORAGE = {
+    'CLOUDINARY_URL': os.environ['CLOUDINARY_URL']
+}
+</code>
+
+By default, Django stores files locally, using the MEDIA_ROOT and MEDIA_URL settings. 
+In that case the whole cloudinary storage business must be removed from settings.py
+and **MEDIA_ROOT** and **MEDIA_URL** specified. The former is the **absolute path** on the
+machine running the script and the latter is the **URL** that must be used in the requests 
+for the files.
+
+### Database settings
+The application uses a django.db.backends.postgresql_psycopg2 engine, so it does expect the DBMS to be PostgresSQL.
+Here is the code-snippet from settings.py
+<code>
+DATABASES = {
+    "default": {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+
+        'NAME': os.environ['DB_NAME'],
+
+        'USER': os.environ['DB_USER'],
+
+        'PASSWORD': os.environ['DB_PASSWORD'],
+
+        'HOST': os.environ['DB_HOST'],
+
+        'PORT': os.environ['DB_PORT'],
+    }
+}
+</code>
+
+However, you can use any other engine. Only in that case, you will have to override this part in settings.py.
+And use the settings dictated by the vondor of the engine. Which I am sure will not differ by much from the ones
+that you see above.
+
+Here is the set of varaibles used by this application:
+**DB_NAME** = name of the database
+**DB_USER** = name of the user that has access to the database
+**DB_PASSWORD** = the password
+**DB_HOST** = either the IP of the host or hostname(Domain)
+**DB_PORT** = the port number
+
+### Client origin
+**CLIENT_ORIGIN** = URL at which the Front end was deployed
+This setting is required by django-cors-headers, which is a Django application 
+for handling the server headers required for Cross-Origin Resource Sharing (CORS).
+
+Here is a code-snippet from settings.py:
+<code>
+    # Allow Request from ...
+    if 'CLIENT_ORIGIN' in os.environ:
+    CORS_ALLOWED_ORIGINS = [
+        os.environ.get('CLIENT_ORIGIN')
+    ]
+</code>
+
+### Secret key
+**SECRET_KEY** = some random string of characters that will be used as a secret key for encryption
+
+### Debugging
+In order to use the views for debugging you can set 
+DEV = "1"
+#### To turn the debugging mode back off
+Just remove the variable all together
+
+In the deployed version, it can be switched on and off. But must be removed for comercial 
+deployment.
+
+#### Deployment on heroku
+The variables mentioned above translate to ConfigVars on heroku. Those can be found in **Settings** Tab
+of the deployed app. As soon as all of those variables are set to **valid values** it can be deployed.
+On heroku just go to **Deploy** Tab and click on the button that reads **'Deploy'**
