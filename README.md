@@ -1,4 +1,76 @@
 # organizer_api
+
+## Tests
+### Authentication
+Authentication has been tested by using the Views provided by DRF.
+Also, the application uses dj-rest-auth. Which is a well tested app.
+But it seems that this version does have a few bugs, whose fix was
+provided by Code Institute and can be found in organizer_api_prj.views.py
+#### Registration
+- I have registered several users.
+- The validation works.
+- The users are added as expected.
+
+#### Login
+- Users can sign in
+- The validation works.
+
+#### Logout
+- Users can log out
+
+### Test Listing Tasks
+As a **User** I can **retrieve a list their own tasks** so that **the front end can display them**
+- [x] Tasks list only contains tasks that either belong to the user or have been assigned to the user
+- [x] Task list can be ordered by due_date, title
+- [x] Task can be searched by title, due_date
+- [x] Task list can be filtered by due_date
+- [x] Tasks are serialized in JSON format
+
+### Test Creating Tasks
+As an **authenticated user** I can **create tasks**
+- [x] The current user becomes the owner of the task
+- [x] Task fields are validated
+- [x] The created task reflects the submitted Task
+
+### Test Deleting Tasks
+As a **authenticated user** I can **delete tasks** 
+- [x] Tasks can be deleted by the owner
+- [x] Task can be deleted by the assigned teammate
+
+### Test Updating Tasks
+As an **authenticated user** I can **update tasks**
+- [x] The updated task reflects the submitted data 
+- [x] Access granted only to the owner or a teammate, to whom the task was assigned
+
+### Test Listing Teams
+As a **authenticated user** I can **retrieve a list of teams**
+- [x] All teams are listed
+- [x] Teams can be filtered by username
+- [x] Teams can be filtered by title(team name)
+
+### Test creating Teams
+As a **authenticated user** I can **create teams** 
+- [x] User can create a team
+- [x] User creating the team is made the owner of the team
+- [x] The created team reflects the submitted data
+- [x] The same team cannot be created twice (team.owner + team.name) must be unique
+
+### Test updating Teams
+As an **atuhenticated user** and owner of the team I can **update teams**
+- [x] The team is updated correctly
+- [x] The validation works
+
+### Test joining Teams
+As a **authenticated user** I can **join other teams**
+- [x] Membership entry is created correctly - your user becomes member of the targeted team
+- [x] Membership allows team owners to assign a task to you as a teammate
+
+### Test leaving Teams
+As a **authenticated user** I can **leave teams**
+- [x] Upon leaving a team, the team owner cannot assign tasks to the user
+- [x] The membership entry is deleted
+
+
 ## URL routes of the API
 ### Authentication
 #### Request user object an access tokens
@@ -222,7 +294,8 @@ If the task is not found the **Response** will have the status **400** Bad Reque
 To **delete a task** you need to send a **DELETE-request** to this url **[deployedURL]/task/<int:pk>**
 
 ## Deployment
-To deploy this application it is required to set environment variables that it uses:
+To deploy this application it is required to set environment variables that it uses.
+
 ### Cloudinary account
 **CLOUDINARY_URL** = 'cloudinary://long-string-of-mumbo-jumbo'
 This variable must be set to carry that URL
@@ -303,6 +376,6 @@ In the deployed version, it can be switched on and off. But must be removed for 
 deployment.
 
 #### Deployment on heroku
-The variables mentioned above translate to ConfigVars on heroku. Those can be found in **Settings** Tab
+The variables mentioned above translate to **ConfigVars** on heroku. Those can be found in **Settings** Tab
 of the deployed app. As soon as all of those variables are set to **valid values** it can be deployed.
 On heroku just go to **Deploy** Tab and click on the button that reads **'Deploy'**
