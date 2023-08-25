@@ -73,31 +73,44 @@ As a **authenticated user** I can **leave teams**
 
 ## URL routes of the API
 ### Authentication
-#### Request user object an access tokens
+#### Request a user object and access tokens
 Request user object for the context **[deployedURL]/dj-rest-auth/user/**
-Returns pk, username, email, first_name, last_name
+
+Returns fileds **pk, username, email, first_name, last_name**
+
 The request will also store an access token, in a cookie, that expires in 5 minutes
 The request will aslo store a refresh token, in a cookie,  that can be used to refresh access token
+
 #### Request to refresh access tokens
 POST Request to refresh access token **[deployedURL]/dj-rest-auth/token/refresh/**
+
 #### Request to register a user
 Post request for Registration **[deployedURL]/dj-rest-auth/registration/**
 The Content Type of the POST request must be **multipart/form-data**
+Required fields in the form:
+**username, password1, password2**
+
 #### Request to login a user
 POST request for Login **[deployedURL]/dj-rest-auth/login/**
 The Content Type of the POST request must be **multipart/form-data**
 The form must contain the following fields:
-username, email, password
+**username, password**
+
 Returns **Token key**
+
 #### Request to logout a user
 To logout a user just send a POST request to **[deployedURL]/dj-rest-auth/logout/**
 
 ### Team app
-The following URLs will only work for authenticated users.
+
+**The following URLs will only work for authenticated users!**
+
 #### Request a list of teams
 Send a GET-Request to the URL **[deployedURL]/team/**
 The response will contain a JSON dictionary in its data field.
 The format of the JSON data will look like this:
+
+<code>
 {
     "count": 8,
     "next": "http://127.0.0.1:8000/team/?limit=3&offset=3",
@@ -118,6 +131,8 @@ The format of the JSON data will look like this:
         ...
     ]
 }
+</code>
+
 The **data** field is paginated so **count** the number of entries, **next** is the index of the next page,
 **previous** is the index of the previous page, **results** is the actual data in form of an array.
 The array holds a set of dictionaries with the following attributes for each team
@@ -147,15 +162,21 @@ The Form must contain only one field **name**
 
 If the name is blank, then the Response will have the STATUS 400 and contain
 the following attribute: 
+
+<code>
 "name": [
         "This field may not be blank."
     ]
+</code>
+
 
 To **delete a team** you need to send a **DELETE-request** to **[deployedURL]/team/<int:pk>/**
 
 #### Get a list of teammates
 Send a GET-Request to **[deployedURL]/teammates/** 
 The **data** field in the Response will have a list of teammates that looks like this:
+
+<code>
 {
     "count": 3,
     "next": null,
@@ -177,6 +198,9 @@ The **data** field in the Response will have a list of teammates that looks like
         }
     ]
 }
+</code>
+
+
 The **data** field is paginated so **count** the number of entries, **next** is the index of the next page,
 **previous** is the index of the previous page, **results** is the actual data in form of an array.
 The array holds a set of dictionaries with the following attributes for each teammate:
@@ -188,6 +212,8 @@ The array holds a set of dictionaries with the following attributes for each tea
 #### Get a List of team memberships 
 Send a GET-Request to **[deployedURL]/membership/**
 The list will only contain teams that the are not owned by the current user
+
+<code>
 {
     "count": 2,
     "next": null,
@@ -209,6 +235,8 @@ The list will only contain teams that the are not owned by the current user
         }
     ]
 }
+</code>
+
 The **data** field is paginated so **count** the number of entries, **next** is the index of the next page,
 **previous** is the index of the previous page, **results** is the actual data in form of an array.
 The array holds a set of dictionaries with the following attributes for each membership:
@@ -224,6 +252,7 @@ Send a **DELETE-Request** to **[deployedURL]/leave/team/<int:team_id>**
 Send a **GET-Request** to **[deployedURL]/task/**
 The **data** field is paginated so **count** the number of entries, **next** is the index of the next page,
 **previous** is the index of the previous page, **results** is the actual data in form of an array.
+
 The array holds a set of dictionaries with the following attributes for each Task:
 - **id** is the id of the Task
 - **owner** is the username of the one who ones the task
@@ -253,6 +282,7 @@ The Form must contain the following fields:
 - **priority** A number from 0 to 2 (0- High, 1- Middle, 2- Low)
 - **status** A number from 0 to 2 (0- Open, 1- Progressing, 2- Done)
 - **file** URL of a image file that was attached to the task or **null**
+
 The Response will contain the same fields plus the **id** as the first field([see task list](#get-a-list-of-tasks))
 
 #### Retrieve a Task by id
@@ -270,6 +300,7 @@ The **data** field in the Response will have the follwing fields:
 - **priority** A number from 0 to 2 (0- High, 1- Middle, 2- Low)
 - **status** A number from 0 to 2 (0- Open, 1- Progressing, 2- Done)
 - **file** URL of a image file that was attached to the task or **null**
+
 If the task is not found the **Response** will have the status **400** Bad Request
 
 ##### Update an existing task by id
@@ -297,14 +328,16 @@ To **delete a task** you need to send a **DELETE-request** to this url **[deploy
 To deploy this application it is required to set environment variables that it uses.
 
 ### Cloudinary account
+If you register with Cloudinary, you will get a URL that can be used for storing files.
+
 **CLOUDINARY_URL** = 'cloudinary://long-string-of-mumbo-jumbo'
 This variable must be set to carry that URL
-If you register with Cloudinary, you will get a URL that can be used for storing files.
 
 You can use any other storage system, all you need to do is override the **DEFAULT_FILE_STORAGE**
 variable in settings.py. Of course you might have to add another line or two of code to settings.py
 depending on what the storage system requires. For cloudinary it is for instance mandoatory that 
 the cloudanry storage dictionary be added to settings.py. Here is what it looks like in my file:
+
 <code>
 CLOUDINARY_STORAGE = {
     'CLOUDINARY_URL': os.environ['CLOUDINARY_URL']
@@ -376,6 +409,18 @@ In the deployed version, it can be switched on and off. But must be removed for 
 deployment.
 
 #### Deployment on heroku
-The variables mentioned above translate to **ConfigVars** on heroku. Those can be found in **Settings** Tab
+To deploy the application on heroku, the requirements.txt must be in the folder.
+The Procfile must be in place and contain this code:
+
+<code>
+ release: python manage.py makemigrations && python manage.py migrate
+ web: gunicorn organizer_api_prj.wsgi
+</code>
+
+The Procfile is used for initializing the application every time it is deployed.
+The code above states that before deployment the comands makemigrations and then migrate must be executed.
+It also tells the gunicorn server the name of the WSGI file, which is a python script file that instanciates this application in WSGI-mode.
+
+The **variables** mentioned above translate to **ConfigVars** on heroku. Those can be found in **Settings** Tab
 of the deployed app. As soon as all of those variables are set to **valid values** it can be deployed.
 On heroku just go to **Deploy** Tab and click on the button that reads **'Deploy'**
