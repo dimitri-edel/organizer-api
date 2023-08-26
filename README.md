@@ -1,4 +1,736 @@
-# organizer_api
+# ORGANIZER API
+
+The API allows a front end application to store and access data for a basic organizer.
+## FEATURES
+## Authentication
+Users can register with the API. Upon registration they can sign in or out, using their credentials.
+[See URL Requests for Authentication](#authentication)
+
+### Forming Teams
+Authenticated users can create Teams. A Team entity contains the id of the user whoe created it and the name of the team. The user who created the team can also rename it or delete it. [See URL Requests for Forming Teams](#forming-teams)
+Authenticated users can [view a list of teams](#list-of-teams), [join teams](#create-memebership), [leave teams](#quit-membership).
+
+### Task Management
+Authenticated users can [list](#list-of-tasks), [create](#create-task), [edit](#update-task-by-id), 
+[retrieve](#retrieve-task-by-id) and [delete](#delete-task-by-id) Tasks.
+
+Also, the users can assign tasks to their teammates. In order to assign a task to a teammate, you will need to specify
+their user-ID in your request, when creating or editing a task. Follow [this link](#list-of-teammates) to see how to
+retrieve a list of teammates with their IDs.
+
+## MODEL
+Here is a sketch of how the model types are related to eachother.
+
+![Model](images/organizer_model.jpg)
+
+## URL ROUTES FOR REQUESTS
+
+All of the following URLs must be appended to the **ROOT URL** of the API.
+**ROOT URL** [deployedURL]
+
+### Authentication
+
+#### Request to register a user
+Request Method: **POST**
+Content-Type: **application/json** or **multipart/form-data***
+URL: **/dj-rest-auth/registration/**
+
+Required fields: **"username":"value", "password1":"value", "password2":"value"**
+
+##### Response if SUCCESSFUL
+Status Code: 201 Created
+Content-Type: **application/json**
+Body: 
+<code>
+"access_token":"token_value", "refresh_token":"token_value", 
+"user":{ 
+    "pk", "integer", "username":"some name", "email", "some email", "first_name", "john", "last_name": "doe"
+}
+
+</code>
+
+##### Response if ERRORS
+###### User already exists
+Status Code: 400 Bad Request
+Content-Type: **application/json**
+Body: 
+<code>
+{
+    "username": [
+        "A user with that username already exists."
+    ]
+}
+</code>
+
+###### Password validation errors
+Status Code: 400 Bad Request
+Content-Type: **application/json**
+Body: 
+<code>
+{
+    "password1": [
+        "This password is too short. It must contain at least 8 characters.",
+        "This password is too common.",
+        "This password is entirely numeric."
+    ]
+}
+</code>
+
+If password1 and password2 don't match the Body will look like this:
+<code>
+{
+    "non_field_errors": [
+        "The two password fields didn't match."
+    ]
+}
+</code>
+
+#### LOGIN
+Request Method: **POST**
+Content-Type: **application/json** or **multipart/form-data***
+URL **/dj-rest-auth/login/**
+Required fields:
+**username, password**
+
+##### Response if SUCCESSFUL
+Status Code: 200 OK
+Content-Type: **application/json**
+Body: 
+<code>
+"access_token":"token_value", "refresh_token":"token_value", 
+"user":{ 
+    "pk", "integer", "username":"some name", "email", "some email", "first_name", "john", "last_name": "doe"
+}
+
+</code>
+
+##### Respoonse if no password was provided
+Status Code: 400 Bad Request
+Content-Type: **application/json**
+Body: 
+<code>
+{
+    "password": [
+        "This field may not be blank."
+    ]
+}
+</code>
+
+##### Respoonse if the username and password do not exist
+Status Code: 400 Bad Request
+Content-Type: **application/json**
+Body: 
+<code>
+{
+    "non_field_errors": [
+        "Unable to log in with provided credentials."
+    ]
+}
+</code>
+
+
+#### LOGOUT
+Request Method: **POST**
+URL : **/dj-rest-auth/logout/**
+**No Payload required**
+
+#### USER AND ACCESS TOKENS
+**Request user data for for an authenticated user**
+Request Method: **GET**
+URL:  **/dj-rest-auth/user/**
+**No Payload required**
+
+##### Response if SUCCESSFUL
+Status Code: 200 OK
+Content-Type: **application/json**
+Body: 
+<code>
+{
+    "pk": 11,
+    "username": "tester4",
+    "email": "",
+    "first_name": "",
+    "last_name": ""
+}
+</code>
+
+**Access tokens** will also be attached to the response in **cookies**.
+
+##### Response if NOT LOGGED IN
+Status Code: 401 Unauthorized
+Content-Type: **application/json**
+Body: 
+<code>
+{
+    "detail": "Authentication credentials were not provided."
+}
+</code>
+
+#### REFRESH ACCESS TOKENS
+Request Method: **POST**
+URL: **/dj-rest-auth/token/refresh/**
+**No Payload required, except for the cookies in the request**
+
+##### Response if NOT LOGGED IN
+Status Code: 401 Unauthorized
+Content-Type: **application/json**
+Body: 
+<code>
+{
+    "detail": "No valid refresh token found.",
+    "code": "token_not_valid"
+}
+</code>
+
+##### Response if SUCCESSFUL
+Status Code: 200 OK
+Content-Type: **application/json**
+Body: 
+<code>
+{
+    "access": "a-long-string-of-jibber-jabber",
+    "access_token_expiration": "2023-08-26T11:05:05.727454Z"
+}
+</code>
+
+**Access tokens** will be attached to the **Cookies** in the Response as well.
+
+
+### Team app
+
+**The following URLs will only work for authenticated users!**
+
+#### LIST OF TEAMS
+Request Method: **GET**
+URL: **/team/**
+
+##### Response
+Status Code: 200 OK
+Conent-Type: application/json
+Body:
+<code>
+{
+    "count": 8,
+    "next": "http://127.0.0.1:8000/team/?limit=3&offset=3",
+    "previous": null,
+    "results": [
+        {
+            "id": 2,
+            "owner": "dj_admin",
+            "name": "Administration changed",
+            "is_member": false
+        },
+        {
+            "id": 6,
+            "owner": "dj_test",
+            "name": "Chill Team",
+            "is_member": false
+        }
+        ...
+    ]
+}
+</code>
+
+The data is **paginated**. Thus,**count** is the number of entries, **next** is the index of the next page,
+**previous** is the index of the previous page, **results** is the actual data in form of an array.
+The array holds a set of dictionaries with the following attributes for each team
+- **id** is the id of the team
+- **owner** is the username of the one who owns the team
+- **name** is the name of the team
+- **is_member** is a boolean that signigies whether or not user requesting the information is member of that team
+
+#### CREATE NEW TEAM
+Request Method **POST**
+Content-Type: **application/json** or **multipart/form-data**
+URL: **/team/**
+Body: **{ "name":"name of team" }**
+
+##### Response if SUCCESSFUL
+Status Code: 200 OK
+Conent-Type: application/json
+Body:
+<code>
+{
+    "count": 8,
+    "next": "http://127.0.0.1:8000/team/?limit=3&offset=3",
+    "previous": null,
+    "results": [
+        {
+            "id": 2,
+            "owner": "dj_admin",
+            "name": "Administration changed",
+            "is_member": false
+        },
+        {
+            "id": 6,
+            "owner": "dj_test",
+            "name": "Chill Team",
+            "is_member": false
+        }
+        ...
+    ]
+}
+</code>
+
+##### Response if NAME FIELD IS EMPTY
+Status Code: 400 Bad Request
+Conent-Type: application/json
+Body:
+<code>
+{
+    "name": [
+        "This field may not be blank."
+    ]
+}
+</code>
+
+#### RETRIEVE TEAM
+Request Method: **GET**
+URL: **/team/<int:pk>/**, where the private key(ID) of the team msut be specified in the path
+
+##### Response if SUCCESSFUL
+Status Code: 200 OK
+Content-Type: application/json
+Body:
+<code>
+{
+    "id": 7,
+    "owner": "dj_admin",
+    "name": "New team",
+    "is_member": false
+}
+</code>
+
+Fields: 
+- **id** is the private key of the team
+- **owner** is the username of the one who created the team
+- **name** is the name of the team,
+- **is_member** is a boolean value that specified if the user in the request is a member of that team
+
+###### Response if NOT FOUND
+Status Code: 404 Not Found
+Content-Type: application/json
+Body:
+<code>
+{
+    "detail": "Not found."
+}
+</code>
+
+#### UPDATE TEAM
+Request Method: **PUT**
+URL:  **/team/<int:pk>/** pk is the private key of the team, which is an integer value
+Content-Type: **application/json** or **multipart/form-data**
+Body:  **{ "name": "new value" }**
+
+##### Response if SUCCESSFUL
+Status Code: 200 OK
+Content-Type: **application/json**
+Body: 
+<code>
+{
+    "id": 7,
+    "owner": "your username",
+    "name": "XXX Team",
+    "is_member": false
+}
+</code>
+
+Fields: 
+- **id** is the private key of the team
+- **owner** is the username of the one who created the team
+- **name** is the name of the team,
+- **is_member** is a boolean value that specified if the user in the request is a member of that team
+
+
+##### Response if NAME FIELD IS EMPTY
+Status Code: 400 Bad Request
+Content-Type: **application/json**
+Body: 
+<code>
+{
+    "name": [
+        "This field may not be blank."
+    ]
+}
+</code>
+
+#### DELETE TEAM
+Request Method: **DELETE**
+URL:  **/team/<int:pk>/** pk is the private key of the team, which is an integer value
+**No Payload required**
+
+##### Response if SUCCESSFUL
+Status Code: 204 No Conent
+
+###### Response if NOT FOOUND
+Status Code: 404 Not Found
+Content-Type: application/json
+Body:
+<code>
+{
+    "detail": "Not found."
+}
+</code>
+
+#### LIST OF TEAMMATES
+Request Method: **GET**
+URL: **/teammates/** 
+**No Payload required**
+
+##### Response if SUCCESSFUL
+Status Code : 200 OK
+Contenxt-Type: application/json
+Body:
+<code>
+{
+    "count": 3,
+    "next": null,
+    "previous": null,
+    "results": [
+        {
+            "id": 1,
+            "team_name": "DJ Team",
+            "team": 1,
+            "user_id": 3,
+            "member": "dj_test"
+        },
+        {
+            "id": 6,
+            "team_name": "DJ Team",
+            "team": 1,
+            "user_id": 4,
+            "member": "tester1"
+        }
+    ]
+}
+</code>
+
+
+The data is paginated. Thus, **count** is the number of entries, **next** is the index of the next page,
+**previous** is the index of the previous page, **results** is the actual data in form of an array.
+The array holds a set of dictionaries with the following attributes for each teammate:
+- **id** is the id of the team
+- **team_name** is the name of the team
+- **user_id** is the id of the user that is a member of the team
+- **member** is the username of the teammate
+
+#### LIST OF TEAM MEMBERSHIPS
+**NOTE! The list will only contain teams that the are not owned by the user in the request!**
+
+Request Method: **GET**
+URL: **/membership/**
+**No Payload required**
+
+##### Responose if SUCCESSFUL
+Status Code: 200 OK
+Content-Type: application/json
+Body:
+<code>
+{
+    "count": 2,
+    "next": null,
+    "previous": null,
+    "results": [
+        {
+            "id": 14,
+            "team_name": "Testing",
+            "team": 4,
+            "user_id": 1,
+            "member": "dj_admin"
+        },
+        {
+            "id": 13,
+            "team_name": "Extensive testing",
+            "team": 12,
+            "user_id": 1,
+            "member": "dj_admin"
+        }
+    ]
+}
+</code>
+
+The data is paginated. Thus  **count** is the number of entries, **next** is the index of the next page,
+**previous** is the index of the previous page, **results** is the actual data in form of an array.
+The array holds a set of dictionaries with the following attributes for each membership:
+- **id** is the membership id
+- **team_name** is the name of the team that the membership is of
+- **user_id** is the own user.id
+- **member** is your username
+
+#### CREATE MEMEBERSHIP
+Response Method: **POST**
+Content-Type: **application/json** or **multipart/form-data**
+URL: **/membership/**
+Body:
+<code>
+{
+    "team": 12    
+}    
+</code>
+
+Fields:
+- **team** is the private key (ID) of the team that the user wants to join
+
+##### Response if SUCCESSFUL
+Status Code: 201 Created
+Content-Type: application/json
+Body:
+<code>
+{
+    "id": 15,
+    "team_name": "Extensive testing",
+    "team": 12,
+    "user_id": 1,
+    "member": "dj_admin"
+}
+</code>
+
+Fields:
+- **id** is the membership id
+- **team_name** is the name of the team that the membership is of
+- **user_id** is the own user.id
+- **member** is your username
+
+#### QUIT MEMBERSHIP
+Request Method: **DELETE**
+URL: **/leave/team/<int:team_id>**
+**No Payload required**
+
+##### Response if SUCCESSFUL
+Status Code: 204 No Content
+
+##### Response if NOT ALLOWED or NOT FOUND
+Status Code: 404 Not Found
+Conent-Type: application/json
+Body:
+<code>
+{
+    "detail": "Not found."
+}
+</code>
+
+#### LIST OF TASKS
+Request Method: **GET**
+URL:  **/tasks/**
+**No Payload required**
+
+##### Response if SUCCESSFUL
+Status Code: 200 OK
+Content-Type: application/json
+Body:
+<code>
+{
+    "count": 35,
+    "next": "https://organizer-api-f1f640e8d82c.herokuapp.com/tasks/?limit=3&offset=3",
+    "previous": null,
+    "results": [
+        {
+            "id": 20,
+            "owner": "dj_admin",
+            "is_owner": true,
+            "asigned_to": null,
+            "title": "ADASFAD",
+            "comment": "rzuzr4uz6r4uru",
+            "due_date": "15 Sep 2023 15:41",
+            "category": 0,
+            "priority": 2,
+            "status": 0,
+            "file": null
+        },
+        {
+            "id": 31,
+            "owner": "dj_admin",
+            "is_owner": true,
+            "asigned_to": null,
+            "title": "third thing",
+            "comment": "coment coment coment coment coment coment coment coment coment coment coment coment coment coment coment coment coment coment",
+            "due_date": "01 Sep 2023 20:57",
+            "category": 0,
+            "priority": 0,
+            "status": 0,
+            "file": null
+        },
+        {
+            "id": 25,
+            "owner": "dj_admin",
+            "is_owner": true,
+            "asigned_to": null,
+            "title": "some other task for septemper",
+            "comment": "comenting ...comenting ...comenting ...comenting ...comenting ...comenting ...comenting ...comenting ...comenting ...comenting ...comenting ...comenting ...comenting ...comenting ...",
+            "due_date": "01 Sep 2023 17:07",
+            "category": 0,
+            "priority": 1,
+            "status": 0,
+            "file": null
+        }
+    ]
+}
+</code>
+
+The **data** field is paginated. Thus, **count** is the number of entries, **next** is the index of the next page,
+**previous** is the index of the previous page, **results** is the actual data in form of an array.
+
+The array holds a set of dictionaries with the following attributes for each Task:
+- **id** is the id of the Task
+- **owner** is the username of the one who ones the task
+- **is_owner** is a boolean that signifies if the user in the request is the owner of the Task
+- **asigned_to** is the id of the user who the task is assigned to, if the task is not assigned the value is **null**
+- **asigned_to_username** the username of the user who the task was assigned to, otherwise **null**
+- **title** The name of the Task
+- **comment** Comment for the task or **null**
+- **due_date** The due date and time in the following format: "05. Sep 2023 10:15"
+- **category** A number from 0 to 2 (0- Chore, 1- Errand, 2- Work)
+- **priority** A number from 0 to 2 (0- High, 1- Middle, 2- Low)
+- **status** A number from 0 to 2 (0- Open, 1- Progressing, 2- Done)
+- **file** URL of a image file that was attached to the task or **null**
+
+#### CREATE TASK
+Request Method: **POST**
+Content-Type: **application/json** or **multipart/form-data**
+URL:  **/tasks/**
+Body:
+<code>
+    {
+        "asigned_to": null,
+        "title": "some other task for septemper",
+        "comment": "comenting ...comenting ...comenting ...comenting ...comenting ...comenting ...comenting ..comenting ...comenting ...comenting ...comenting ...comenting ...comenting ...comenting ...",
+        "due_date": "2023-09-01T17:07",
+        "category": 0,
+        "priority": 1,
+        "status": 0,
+        "file": null
+    }
+</code>
+
+Fields:
+- **asigned_to** is the id of the user who the task is assigned to, if the task is not assigned the value is **null**
+- **asigned_to** the user-id of the teammate, to whomm this task will be assigned, otherwise **null**
+- **title** The name of the Task
+- **comment** Comment for the task or **null**
+- **due_date** The due date and time in the following **format**: "2023-09-01T10:00" Year-Month-Day T Hour-Minute
+- **category** A number from 0 to 2 (0- Chore, 1- Errand, 2- Work)
+- **priority** A number from 0 to 2 (0- High, 1- Middle, 2- Low)
+- **status** A number from 0 to 2 (0- Open, 1- Progressing, 2- Done)
+- **file** URL of a image file that was attached to the task or **null**
+
+##### Response if SUCCESSFUL
+Status Code: 200 OK
+Context-Type: application/json
+Body:
+<code>
+{
+    "id": 57,
+    "owner": "dj_admin",
+    "is_owner": true,
+    "asigned_to": null,
+    "title": "some other task for septemper",
+    "comment": "comenting ...comenting ...comenting ...comenting ...comenting ...comenting ...comenting ..comenting ...comenting ...comenting ...comenting ...comenting ...comenting ...comenting ...",
+    "due_date": "01 Sep 2023 17:15",
+    "category": 0,
+    "priority": 1,
+    "status": 0,
+    "file": null
+}
+</code>
+
+##### Response if VALIDATION ERRORS
+**The response will return a jason file that contains the field name that failed validation and an array of possible reasons**
+
+Status-Code: 400 Bad Request
+Content-Type: application/json
+Body:
+<code>
+{
+    "due_date": [
+        "Datetime has wrong format. Use one of these formats instead: YYYY-MM-DDThh:mm[:ss[.uuuuuu]][+HH:MM|-HH:MM|Z]."
+    ]
+}
+</code>
+
+#### RETRIEVE TASK BY ID
+Request Method: **GET**
+URL: **/task/<int:pk>** pk is the private key (ID) of the task 
+**No Payload required**
+
+##### Response if SUCCESSFUL
+Status Code: 200 OK
+Content-Type: application/json
+Body:
+<code>
+
+    "id": 36,
+    "owner": "dj_admin",
+    "is_owner": false,
+    "asigned_to": null,
+    "title": "Do something",
+    "comment": "bla bla la  la  la  la  la  la  la  la  la  la  la  la  la  la  la  la  la  la  la",
+    "due_date": "21 Aug 2023 10:06",
+    "category": 0,
+    "priority": 0,
+    "status": 2,
+    "file": null
+}
+</code>
+
+The data in the Response will have the follwing fields:
+- **id** is the id of the Task
+- **owner** is the username of the one who ones the task
+- **is_owner** is a boolean that signifies if the user in the request is the owner of the Task
+- **asigned_to** is the id of the user who the task is assigned to, if the task is not assigned the value is **null**
+- **asigned_to_username** the username of the user who the task was assigned to, otherwise **null**
+- **title** The name of the Task
+- **comment** Comment for the task or **null**
+- **due_date** The due date and time in the following format: "05. Sep 2023 10:15"
+- **category** A number from 0 to 2 (0- Chore, 1- Errand, 2- Work)
+- **priority** A number from 0 to 2 (0- High, 1- Middle, 2- Low)
+- **status** A number from 0 to 2 (0- Open, 1- Progressing, 2- Done)
+- **file** URL of a image file that was attached to the task or **null**
+
+If the task is not found the **Response** will have the status **400** Bad Request
+
+##### UPDATE TASK BY ID
+Request Method: **PUT**
+Content-Type: **application/json** or **multipart/form-data**
+URL: **/task/<int:pk>**
+Body:
+<code>
+{ 
+    "title": "New title",
+    "due_date": "2023-09-15T18:41",
+    "category": 0,
+    "priority": 2,
+    "status": 0
+}
+</code>
+
+Fields:
+The **nullable fields** must have an **empty string** if you want them to be blank.
+The **required fields**, which are title, due_date, category, priority and status, must be supplied in the request. 
+**See the boday of the request above**
+
+- **asigned_to** is the id of the user who the task is assigned to, if the task is not assigned the value is **null**
+- **asigned_to** the user-id of the teammate, to whom the task must be assigned, otherwise **null**
+- **title** The name of the Task
+- **comment** Comment for the task or **null**
+- **due_date** The due date and time in the following format: "05. Sep 2023 10:15"
+- **category** A number from 0 to 2 (0- Chore, 1- Errand, 2- Work)
+- **priority** A number from 0 to 2 (0- High, 1- Middle, 2- Low)
+- **status** A number from 0 to 2 (0- Open, 1- Progressing, 2- Done)
+- **file** URL of a image file that was attached to the task or **null**
+
+If the task is not found the **Response** will have the status **400** Bad Request
+
+#### DELETE TASK BY ID
+Request Method: **DELETE**
+URL: **/task/<int:pk>** pk is the private key (ID) of the task
+**No Payload required**
+
+##### Response if DELETED
+Status-Code: 204 No Content
+
+##### Response if NOT FOUND
+Status Code: 404 Not found
 
 ## Tests
 ### Authentication
@@ -14,6 +746,76 @@ provided by Code Institute and can be found in organizer_api_prj.views.py
 #### Login
 - Users can sign in
 - The validation works.
+## Tests
+### Authentication
+Authentication has been tested by using the Views provided by DRF.
+Also, the application uses dj-rest-auth. Which is a well tested app.
+But it seems that this version does have a few bugs, whose fix was
+provided by Code Institute and can be found in organizer_api_prj.views.py
+#### Registration
+- I have registered several users.
+- The validation works.
+- The users are added as expected.
+
+#### Login
+- Users can sign in
+- The validation works.
+
+#### Logout
+- Users can log out
+
+### Test Listing Tasks
+As a **User** I can **retrieve a list their own tasks** so that **the front end can display them**
+- [x] Tasks list only contains tasks that either belong to the user or have been assigned to the user
+- [x] Task list can be ordered by due_date, title
+- [x] Task can be searched by title, due_date
+- [x] Task list can be filtered by due_date
+- [x] Tasks are serialized in JSON format
+
+### Test Creating Tasks
+As an **authenticated user** I can **create tasks**
+- [x] The current user becomes the owner of the task
+- [x] Task fields are validated
+- [x] The created task reflects the submitted Task
+
+### Test Deleting Tasks
+As a **authenticated user** I can **delete tasks** 
+- [x] Tasks can be deleted by the owner
+- [x] Task can be deleted by the assigned teammate
+
+### Test Updating Tasks
+As an **authenticated user** I can **update tasks**
+- [x] The updated task reflects the submitted data 
+- [x] Access granted only to the owner or a teammate, to whom the task was assigned
+
+### Test Listing Teams
+As a **authenticated user** I can **retrieve a list of teams**
+- [x] All teams are listed
+- [x] Teams can be filtered by username
+
+### Test creating Teams
+As a **authenticated user** I can **create teams** 
+- [x] User can create a team
+- [x] User creating the team is made the owner of the team
+- [x] The created team reflects the submitted data
+- [x] The same team cannot be created twice (team.owner + team.name) must be unique
+
+### Test updating Teams
+As an **atuhenticated user** and owner of the team I can **update teams**
+- [x] The team is updated correctly
+- [x] The validation works
+
+### Test joining Teams
+As a **authenticated user** I can **join other teams**
+- [x] Membership entry is created correctly - your user becomes member of the targeted team
+- [x] Membership allows team owners to assign a task to you as a teammate
+
+### Test leaving Teams
+As a **authenticated user** I can **leave teams**
+- [x] Upon leaving a team, the team owner cannot assign tasks to the user
+- [x] The membership entry is deleted
+
+
 
 #### Logout
 - Users can log out
@@ -70,259 +872,6 @@ As a **authenticated user** I can **leave teams**
 - [x] Upon leaving a team, the team owner cannot assign tasks to the user
 - [x] The membership entry is deleted
 
-
-## URL routes of the API
-### Authentication
-#### Request a user object and access tokens
-Request user object for the context **[deployedURL]/dj-rest-auth/user/**
-
-Returns fileds **pk, username, email, first_name, last_name**
-
-The request will also store an access token, in a cookie, that expires in 5 minutes
-The request will aslo store a refresh token, in a cookie,  that can be used to refresh access token
-
-#### Request to refresh access tokens
-POST Request to refresh access token **[deployedURL]/dj-rest-auth/token/refresh/**
-
-#### Request to register a user
-Post request for Registration **[deployedURL]/dj-rest-auth/registration/**
-The Content Type of the POST request must be **multipart/form-data**
-Required fields in the form:
-**username, password1, password2**
-
-#### Request to login a user
-POST request for Login **[deployedURL]/dj-rest-auth/login/**
-The Content Type of the POST request must be **multipart/form-data**
-The form must contain the following fields:
-**username, password**
-
-Returns **Token key**
-
-#### Request to logout a user
-To logout a user just send a POST request to **[deployedURL]/dj-rest-auth/logout/**
-
-### Team app
-
-**The following URLs will only work for authenticated users!**
-
-#### Request a list of teams
-Send a GET-Request to the URL **[deployedURL]/team/**
-The response will contain a JSON dictionary in its data field.
-The format of the JSON data will look like this:
-
-<code>
-{
-    "count": 8,
-    "next": "http://127.0.0.1:8000/team/?limit=3&offset=3",
-    "previous": null,
-    "results": [
-        {
-            "id": 2,
-            "owner": "dj_admin",
-            "name": "Administration changed",
-            "is_member": false
-        },
-        {
-            "id": 6,
-            "owner": "dj_test",
-            "name": "Chill Team",
-            "is_member": false
-        }
-        ...
-    ]
-}
-</code>
-
-The **data** field is paginated so **count** the number of entries, **next** is the index of the next page,
-**previous** is the index of the previous page, **results** is the actual data in form of an array.
-The array holds a set of dictionaries with the following attributes for each team
-- **id** is the id of the team
-- **owner** is the username of the one who owns the team
-- **name** is the name of the team
-- **is_member** is a boolean that signigies whether or not user requesting the information is member of that team
-
-#### Create new Team
-Teams can only be created by authenticated users by sending a **POST-request** to  **[deployedURL]/team/**
-The Content Type of the POST request must be **multipart/form-data**
-The Form must contain only one field **name**
-
-#### Retrieve a Team
-Send a GET-Request to this url **[deployedURL]/team/<int:pk>/**
-The Response will contain a **JSON-object** containing the requested team
-in its **data** field that will have the following attributes: **id, owner, name, is_member**
-and the HTTP STATUS 200 return in the Response object
-
-If there is no such team the **data** field will have this attribute "details":"Not found"
-and the HTTP STATUS 404 returned in the Response object
-
-#### Udate a Team
-You need to send a **PUT-request** to **[deployedURL]/team/<int:pk>/**
-The Content Type of the POST request must be **multipart/form-data**
-The Form must contain only one field **name**
-
-If the name is blank, then the Response will have the STATUS 400 and contain
-the following attribute: 
-
-<code>
-"name": [
-        "This field may not be blank."
-    ]
-</code>
-
-
-To **delete a team** you need to send a **DELETE-request** to **[deployedURL]/team/<int:pk>/**
-
-#### Get a list of teammates
-Send a GET-Request to **[deployedURL]/teammates/** 
-The **data** field in the Response will have a list of teammates that looks like this:
-
-<code>
-{
-    "count": 3,
-    "next": null,
-    "previous": null,
-    "results": [
-        {
-            "id": 1,
-            "team_name": "DJ Team",
-            "team": 1,
-            "user_id": 3,
-            "member": "dj_test"
-        },
-        {
-            "id": 6,
-            "team_name": "DJ Team",
-            "team": 1,
-            "user_id": 4,
-            "member": "tester1"
-        }
-    ]
-}
-</code>
-
-
-The **data** field is paginated so **count** the number of entries, **next** is the index of the next page,
-**previous** is the index of the previous page, **results** is the actual data in form of an array.
-The array holds a set of dictionaries with the following attributes for each teammate:
-- **id** is the id of the team
-- **team_name** is the name of the team
-- **user_id** is the id of the user that is a member of the team
-- **member** is the username of the teammate
-
-#### Get a List of team memberships 
-Send a GET-Request to **[deployedURL]/membership/**
-The list will only contain teams that the are not owned by the current user
-
-<code>
-{
-    "count": 2,
-    "next": null,
-    "previous": null,
-    "results": [
-        {
-            "id": 14,
-            "team_name": "Testing",
-            "team": 4,
-            "user_id": 1,
-            "member": "dj_admin"
-        },
-        {
-            "id": 13,
-            "team_name": "Extensive testing",
-            "team": 12,
-            "user_id": 1,
-            "member": "dj_admin"
-        }
-    ]
-}
-</code>
-
-The **data** field is paginated so **count** the number of entries, **next** is the index of the next page,
-**previous** is the index of the previous page, **results** is the actual data in form of an array.
-The array holds a set of dictionaries with the following attributes for each membership:
-- **id** is the membership id
-- **team_name** is the name of the team that the membership is of
-- **user_id** is the own user.id
-- **member** is your username
-
-#### Quit a team membership
-Send a **DELETE-Request** to **[deployedURL]/leave/team/<int:team_id>**
-
-#### Get a List of Tasks
-Send a **GET-Request** to **[deployedURL]/task/**
-The **data** field is paginated so **count** the number of entries, **next** is the index of the next page,
-**previous** is the index of the previous page, **results** is the actual data in form of an array.
-
-The array holds a set of dictionaries with the following attributes for each Task:
-- **id** is the id of the Task
-- **owner** is the username of the one who ones the task
-- **is_owner** is a boolean that signifies if the user in the request is the owner of the Task
-- **asigned_to** is the id of the user who the task is assigned to, if the task is not assigned the value is **null**
-- **asigned_to_username** the username of the user who the task was assigned to, otherwise **null**
-- **title** The name of the Task
-- **comment** Comment for the task or **null**
-- **due_date** The due date and time in the following format: "05. Sep 2023 10:15"
-- **category** A number from 0 to 2 (0- Chore, 1- Errand, 2- Work)
-- **priority** A number from 0 to 2 (0- High, 1- Middle, 2- Low)
-- **status** A number from 0 to 2 (0- Open, 1- Progressing, 2- Done)
-- **file** URL of a image file that was attached to the task or **null**
-
-#### Create a Task
-Send a **POST-Request** to **[deployedURL]/task/**
-The Content Type of the POST request must be **multipart/form-data**
-The Form must contain the following fields:
-- **owner** is the username of the one who ones the task
-- **is_owner** is a boolean that signifies if the user in the request is the owner of the Task
-- **asigned_to** is the id of the user who the task is assigned to, if the task is not assigned the value is **null**
-- **asigned_to_username** the username of the user who the task was assigned to, otherwise **null**
-- **title** The name of the Task
-- **comment** Comment for the task or **null**
-- **due_date** The due date and time in the following format: "05. Sep 2023 10:15"
-- **category** A number from 0 to 2 (0- Chore, 1- Errand, 2- Work)
-- **priority** A number from 0 to 2 (0- High, 1- Middle, 2- Low)
-- **status** A number from 0 to 2 (0- Open, 1- Progressing, 2- Done)
-- **file** URL of a image file that was attached to the task or **null**
-
-The Response will contain the same fields plus the **id** as the first field([see task list](#get-a-list-of-tasks))
-
-#### Retrieve a Task by id
-Send a **GET-request** to this url **[deployedURL]/task/<int:pk>**
-The **data** field in the Response will have the follwing fields:
-- **id** is the id of the Task
-- **owner** is the username of the one who ones the task
-- **is_owner** is a boolean that signifies if the user in the request is the owner of the Task
-- **asigned_to** is the id of the user who the task is assigned to, if the task is not assigned the value is **null**
-- **asigned_to_username** the username of the user who the task was assigned to, otherwise **null**
-- **title** The name of the Task
-- **comment** Comment for the task or **null**
-- **due_date** The due date and time in the following format: "05. Sep 2023 10:15"
-- **category** A number from 0 to 2 (0- Chore, 1- Errand, 2- Work)
-- **priority** A number from 0 to 2 (0- High, 1- Middle, 2- Low)
-- **status** A number from 0 to 2 (0- Open, 1- Progressing, 2- Done)
-- **file** URL of a image file that was attached to the task or **null**
-
-If the task is not found the **Response** will have the status **400** Bad Request
-
-##### Update an existing task by id
-Send a **PUT-request** to this url **[deployedURL]/task/<int:pk>**
-The Content Type of the PUT request must be **multipart/form-data**
-and contain these fields. The **nullable fields** must have an **empty string** if you want them to be blank
-- **id** is the id of the Task
-- **owner** is the username of the one who ones the task
-- **is_owner** is a boolean that signifies if the user in the request is the owner of the Task
-- **asigned_to** is the id of the user who the task is assigned to, if the task is not assigned the value is **null**
-- **asigned_to_username** the username of the user who the task was assigned to, otherwise **null**
-- **title** The name of the Task
-- **comment** Comment for the task or **null**
-- **due_date** The due date and time in the following format: "05. Sep 2023 10:15"
-- **category** A number from 0 to 2 (0- Chore, 1- Errand, 2- Work)
-- **priority** A number from 0 to 2 (0- High, 1- Middle, 2- Low)
-- **status** A number from 0 to 2 (0- Open, 1- Progressing, 2- Done)
-- **file** URL of a image file that was attached to the task or **null**
-If the task is not found the **Response** will have the status **400** Bad Request
-
-#### Delete an existing task by id
-To **delete a task** you need to send a **DELETE-request** to this url **[deployedURL]/task/<int:pk>**
 
 ## Deployment
 To deploy this application it is required to set environment variables that it uses.
@@ -409,8 +958,8 @@ In the deployed version, it can be switched on and off. But must be removed for 
 deployment.
 
 #### Deployment on heroku
-To deploy the application on heroku, the requirements.txt must be in the folder.
-The Procfile must be in place and contain this code:
+To deploy the application on heroku, the **requirements.txt** must be in the folder.
+The **Procfile** must be in place and contain this code:
 
 <code>
  release: python manage.py makemigrations && python manage.py migrate
