@@ -2,13 +2,18 @@
 
 The API allows a front end application to store and access data for a basic organizer.
 ## FEATURES
+---
 ## Authentication
 Users can register with the API. Upon registration they can sign in or out, using their credentials.
 [See URL Requests for Authentication](#authentication)
 
+---
+
 ### Forming Teams
 Authenticated users can create Teams. A Team entity contains the id of the user whoe created it and the name of the team. The user who created the team can also rename it or delete it. [See URL Requests for Forming Teams](#forming-teams)
 Authenticated users can [view a list of teams](#list-of-teams), [join teams](#create-memebership), [leave teams](#quit-membership).
+
+---
 
 ### Task Management
 Authenticated users can [list](#list-of-tasks), [create](#create-task), [edit](#update-task-by-id), 
@@ -18,10 +23,14 @@ Also, the users can assign tasks to their teammates. In order to assign a task t
 their user-ID in your request, when creating or editing a task. Follow [this link](#list-of-teammates) to see how to
 retrieve a list of teammates with their IDs.
 
+---
+
 ## MODEL
 Here is a sketch of how the model types are related to eachother.
 
 ![Model](images/organizer_model.jpg)
+
+---
 
 ## URL ROUTES FOR REQUESTS
 
@@ -30,29 +39,50 @@ All of the following URLs must be appended to the **ROOT URL** of the API.
 
 ### Authentication
 
-#### Request to register a user
+#### REGISTRATION
+---
 Request Method: **POST**
+
 Content-Type: **application/json** or **multipart/form-data***
+
 URL: **/dj-rest-auth/registration/**
 
-Required fields: **"username":"value", "password1":"value", "password2":"value"**
+Body:
+<code>
+{
+    "username" : "desired username",
+    "password1" : "password",
+    "password2" : "password"
+}
+</code>
+
+Required fields:
+- **username** the username under which the user will be registered
+- **password1** password
+- **password2** password
+
+---
 
 ##### Response if SUCCESSFUL
 Status Code: 201 Created
+
 Content-Type: **application/json**
+
 Body: 
 <code>
 "access_token":"token_value", "refresh_token":"token_value", 
 "user":{ 
     "pk", "integer", "username":"some name", "email", "some email", "first_name", "john", "last_name": "doe"
 }
-
 </code>
 
-##### Response if ERRORS
-###### User already exists
+---
+
+##### ERROR User already exists
 Status Code: 400 Bad Request
+
 Content-Type: **application/json**
+
 Body: 
 <code>
 {
@@ -62,9 +92,12 @@ Body:
 }
 </code>
 
-###### Password validation errors
+---
+##### ERROR Password validation errors
 Status Code: 400 Bad Request
+
 Content-Type: **application/json**
+
 Body: 
 <code>
 {
@@ -85,16 +118,24 @@ If password1 and password2 don't match the Body will look like this:
 }
 </code>
 
+---
+
 #### LOGIN
+---
 Request Method: **POST**
+
 Content-Type: **application/json** or **multipart/form-data***
+
 URL **/dj-rest-auth/login/**
+
 Required fields:
 **username, password**
-
+---
 ##### Response if SUCCESSFUL
 Status Code: 200 OK
+
 Content-Type: **application/json**
+
 Body: 
 <code>
 "access_token":"token_value", "refresh_token":"token_value", 
@@ -104,9 +145,12 @@ Body:
 
 </code>
 
+---
 ##### Respoonse if no password was provided
 Status Code: 400 Bad Request
+
 Content-Type: **application/json**
+
 Body: 
 <code>
 {
@@ -116,9 +160,12 @@ Body:
 }
 </code>
 
+---
 ##### Respoonse if the username and password do not exist
 Status Code: 400 Bad Request
+
 Content-Type: **application/json**
+
 Body: 
 <code>
 {
@@ -128,21 +175,31 @@ Body:
 }
 </code>
 
-
+---
 #### LOGOUT
 Request Method: **POST**
+
 URL : **/dj-rest-auth/logout/**
+
 **No Payload required**
+
+---
 
 #### USER AND ACCESS TOKENS
 **Request user data for for an authenticated user**
+
 Request Method: **GET**
+
 URL:  **/dj-rest-auth/user/**
+
 **No Payload required**
 
+---
 ##### Response if SUCCESSFUL
 Status Code: 200 OK
+
 Content-Type: **application/json**
+
 Body: 
 <code>
 {
@@ -156,9 +213,12 @@ Body:
 
 **Access tokens** will also be attached to the response in **cookies**.
 
+---
 ##### Response if NOT LOGGED IN
 Status Code: 401 Unauthorized
+
 Content-Type: **application/json**
+
 Body: 
 <code>
 {
@@ -166,14 +226,20 @@ Body:
 }
 </code>
 
+---
 #### REFRESH ACCESS TOKENS
 Request Method: **POST**
+
 URL: **/dj-rest-auth/token/refresh/**
+
 **No Payload required, except for the cookies in the request**
 
+---
 ##### Response if NOT LOGGED IN
 Status Code: 401 Unauthorized
+
 Content-Type: **application/json**
+
 Body: 
 <code>
 {
@@ -182,9 +248,12 @@ Body:
 }
 </code>
 
+---
 ##### Response if SUCCESSFUL
 Status Code: 200 OK
+
 Content-Type: **application/json**
+
 Body: 
 <code>
 {
@@ -195,18 +264,21 @@ Body:
 
 **Access tokens** will be attached to the **Cookies** in the Response as well.
 
-
+---
 ### Team app
 
 **The following URLs will only work for authenticated users!**
-
+---
 #### LIST OF TEAMS
 Request Method: **GET**
-URL: **/team/**
 
+URL: **/team/**
+---
 ##### Response
 Status Code: 200 OK
+
 Conent-Type: application/json
+
 Body:
 <code>
 {
@@ -239,15 +311,22 @@ The array holds a set of dictionaries with the following attributes for each tea
 - **name** is the name of the team
 - **is_member** is a boolean that signigies whether or not user requesting the information is member of that team
 
+---
 #### CREATE NEW TEAM
 Request Method **POST**
+
 Content-Type: **application/json** or **multipart/form-data**
+
 URL: **/team/**
+
 Body: **{ "name":"name of team" }**
 
+---
 ##### Response if SUCCESSFUL
 Status Code: 200 OK
+
 Conent-Type: application/json
+
 Body:
 <code>
 {
@@ -272,9 +351,12 @@ Body:
 }
 </code>
 
+---
 ##### Response if NAME FIELD IS EMPTY
 Status Code: 400 Bad Request
+
 Conent-Type: application/json
+
 Body:
 <code>
 {
@@ -284,12 +366,16 @@ Body:
 }
 </code>
 
+---
 #### RETRIEVE TEAM
 Request Method: **GET**
+
 URL: **/team/<int:pk>/**, where the private key(ID) of the team msut be specified in the path
 
+---
 ##### Response if SUCCESSFUL
 Status Code: 200 OK
+
 Content-Type: application/json
 Body:
 <code>
@@ -307,9 +393,12 @@ Fields:
 - **name** is the name of the team,
 - **is_member** is a boolean value that specified if the user in the request is a member of that team
 
+---
 ###### Response if NOT FOUND
 Status Code: 404 Not Found
+
 Content-Type: application/json
+
 Body:
 <code>
 {
@@ -317,15 +406,22 @@ Body:
 }
 </code>
 
+---
 #### UPDATE TEAM
 Request Method: **PUT**
+
 URL:  **/team/<int:pk>/** pk is the private key of the team, which is an integer value
+
 Content-Type: **application/json** or **multipart/form-data**
+
 Body:  **{ "name": "new value" }**
 
+---
 ##### Response if SUCCESSFUL
 Status Code: 200 OK
+
 Content-Type: **application/json**
+
 Body: 
 <code>
 {
@@ -342,10 +438,12 @@ Fields:
 - **name** is the name of the team,
 - **is_member** is a boolean value that specified if the user in the request is a member of that team
 
-
+---
 ##### Response if NAME FIELD IS EMPTY
 Status Code: 400 Bad Request
+
 Content-Type: **application/json**
+
 Body: 
 <code>
 {
@@ -355,17 +453,24 @@ Body:
 }
 </code>
 
+---
 #### DELETE TEAM
 Request Method: **DELETE**
+
 URL:  **/team/<int:pk>/** pk is the private key of the team, which is an integer value
+
 **No Payload required**
 
+---
 ##### Response if SUCCESSFUL
 Status Code: 204 No Conent
 
+---
 ###### Response if NOT FOOUND
 Status Code: 404 Not Found
+
 Content-Type: application/json
+
 Body:
 <code>
 {
@@ -373,14 +478,19 @@ Body:
 }
 </code>
 
+---
 #### LIST OF TEAMMATES
 Request Method: **GET**
+
 URL: **/teammates/** 
+
 **No Payload required**
 
 ##### Response if SUCCESSFUL
 Status Code : 200 OK
+
 Contenxt-Type: application/json
+
 Body:
 <code>
 {
@@ -415,16 +525,22 @@ The array holds a set of dictionaries with the following attributes for each tea
 - **user_id** is the id of the user that is a member of the team
 - **member** is the username of the teammate
 
+---
 #### LIST OF TEAM MEMBERSHIPS
 **NOTE! The list will only contain teams that the are not owned by the user in the request!**
 
 Request Method: **GET**
+
 URL: **/membership/**
+
 **No Payload required**
 
+---
 ##### Responose if SUCCESSFUL
 Status Code: 200 OK
+
 Content-Type: application/json
+
 Body:
 <code>
 {
@@ -458,10 +574,14 @@ The array holds a set of dictionaries with the following attributes for each mem
 - **user_id** is the own user.id
 - **member** is your username
 
+---
 #### CREATE MEMEBERSHIP
 Response Method: **POST**
+
 Content-Type: **application/json** or **multipart/form-data**
+
 URL: **/membership/**
+
 Body:
 <code>
 {
@@ -472,9 +592,12 @@ Body:
 Fields:
 - **team** is the private key (ID) of the team that the user wants to join
 
+---
 ##### Response if SUCCESSFUL
 Status Code: 201 Created
+
 Content-Type: application/json
+
 Body:
 <code>
 {
@@ -492,17 +615,24 @@ Fields:
 - **user_id** is the own user.id
 - **member** is your username
 
+---
 #### QUIT MEMBERSHIP
 Request Method: **DELETE**
+
 URL: **/leave/team/<int:team_id>**
+
 **No Payload required**
 
+---
 ##### Response if SUCCESSFUL
 Status Code: 204 No Content
 
+---
 ##### Response if NOT ALLOWED or NOT FOUND
 Status Code: 404 Not Found
+
 Conent-Type: application/json
+
 Body:
 <code>
 {
@@ -510,14 +640,20 @@ Body:
 }
 </code>
 
+---
 #### LIST OF TASKS
 Request Method: **GET**
+
 URL:  **/tasks/**
+
 **No Payload required**
 
+---
 ##### Response if SUCCESSFUL
 Status Code: 200 OK
+
 Content-Type: application/json
+
 Body:
 <code>
 {
@@ -585,10 +721,14 @@ The array holds a set of dictionaries with the following attributes for each Tas
 - **status** A number from 0 to 2 (0- Open, 1- Progressing, 2- Done)
 - **file** URL of a image file that was attached to the task or **null**
 
+---
 #### CREATE TASK
 Request Method: **POST**
+
 Content-Type: **application/json** or **multipart/form-data**
+
 URL:  **/tasks/**
+
 Body:
 <code>
     {
@@ -614,9 +754,12 @@ Fields:
 - **status** A number from 0 to 2 (0- Open, 1- Progressing, 2- Done)
 - **file** URL of a image file that was attached to the task or **null**
 
+---
 ##### Response if SUCCESSFUL
 Status Code: 200 OK
+
 Context-Type: application/json
+
 Body:
 <code>
 {
@@ -634,11 +777,14 @@ Body:
 }
 </code>
 
+---
 ##### Response if VALIDATION ERRORS
 **The response will return a jason file that contains the field name that failed validation and an array of possible reasons**
 
 Status-Code: 400 Bad Request
+
 Content-Type: application/json
+
 Body:
 <code>
 {
@@ -648,14 +794,20 @@ Body:
 }
 </code>
 
+---
 #### RETRIEVE TASK BY ID
 Request Method: **GET**
+
 URL: **/task/<int:pk>** pk is the private key (ID) of the task 
+
 **No Payload required**
 
+---
 ##### Response if SUCCESSFUL
 Status Code: 200 OK
+
 Content-Type: application/json
+
 Body:
 <code>
 
@@ -689,10 +841,14 @@ The data in the Response will have the follwing fields:
 
 If the task is not found the **Response** will have the status **400** Bad Request
 
+---
 ##### UPDATE TASK BY ID
 Request Method: **PUT**
+
 Content-Type: **application/json** or **multipart/form-data**
+
 URL: **/task/<int:pk>**
+
 Body:
 <code>
 { 
@@ -721,49 +877,39 @@ The **required fields**, which are title, due_date, category, priority and statu
 
 If the task is not found the **Response** will have the status **400** Bad Request
 
+---
 #### DELETE TASK BY ID
 Request Method: **DELETE**
+
 URL: **/task/<int:pk>** pk is the private key (ID) of the task
+
 **No Payload required**
 
+---
 ##### Response if DELETED
 Status-Code: 204 No Content
-
+---
 ##### Response if NOT FOUND
 Status Code: 404 Not found
-
+---
 ## Tests
 ### Authentication
 Authentication has been tested by using the Views provided by DRF.
 Also, the application uses dj-rest-auth. Which is a well tested app.
 But it seems that this version does have a few bugs, whose fix was
 provided by Code Institute and can be found in organizer_api_prj.views.py
+---
 #### Registration
 - I have registered several users.
 - The validation works.
 - The users are added as expected.
-
-#### Login
-- Users can sign in
-- The validation works.
-## Tests
-### Authentication
-Authentication has been tested by using the Views provided by DRF.
-Also, the application uses dj-rest-auth. Which is a well tested app.
-But it seems that this version does have a few bugs, whose fix was
-provided by Code Institute and can be found in organizer_api_prj.views.py
-#### Registration
-- I have registered several users.
-- The validation works.
-- The users are added as expected.
-
+---
 #### Login
 - Users can sign in
 - The validation works.
 
-#### Logout
-- Users can log out
 
+---
 ### Test Listing Tasks
 As a **User** I can **retrieve a list their own tasks** so that **the front end can display them**
 - [x] Tasks list only contains tasks that either belong to the user or have been assigned to the user
@@ -814,11 +960,6 @@ As a **authenticated user** I can **join other teams**
 As a **authenticated user** I can **leave teams**
 - [x] Upon leaving a team, the team owner cannot assign tasks to the user
 - [x] The membership entry is deleted
-
-
-
-#### Logout
-- Users can log out
 
 ### Test Listing Tasks
 As a **User** I can **retrieve a list their own tasks** so that **the front end can display them**
@@ -872,7 +1013,7 @@ As a **authenticated user** I can **leave teams**
 - [x] Upon leaving a team, the team owner cannot assign tasks to the user
 - [x] The membership entry is deleted
 
-
+---
 ## Deployment
 To deploy this application it is required to set environment variables that it uses.
 
@@ -957,6 +1098,7 @@ Just remove the variable all together
 In the deployed version, it can be switched on and off. But must be removed for comercial 
 deployment.
 
+---
 #### Deployment on heroku
 To deploy the application on heroku, the **requirements.txt** must be in the folder.
 The **Procfile** must be in place and contain this code:
