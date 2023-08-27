@@ -1113,6 +1113,9 @@ Just remove the variable all together
 In the deployed version, it can be switched on and off. But must be removed for comercial 
 deployment.
 
+##### ALLOWED_HOST
+In settings.py there is an array that is called ALLOWED_HOST. It is necessary that the **hostname or IP** be added to that array.
+
 ---
 #### Deployment on heroku
 To deploy the application on heroku, the **requirements.txt** must be in the folder.
