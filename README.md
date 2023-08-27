@@ -25,6 +25,11 @@ retrieve a list of teammates with their IDs.
 
 ---
 
+### PEP8 and Pylint
+For linting the code I used pylint to validate the code. Thus, it is mandatory that Pylint be used to validate the code on another machine, because it was necessary to apply a few instructions for that tool in the code. For instance, it does not recognize dynamically attached properties and will throw an error, even if the property is valid.
+
+---
+
 ## MODEL
 Here is a sketch of how the model types are related to eachother.
 
