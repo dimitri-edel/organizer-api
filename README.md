@@ -128,8 +128,15 @@ Content-Type: **application/json** or **multipart/form-data***
 
 URL **/dj-rest-auth/login/**
 
-Required fields:
-**username, password**
+Body: 
+<code>
+{
+    "username": "someusername",
+    "password": "somepassword"
+}
+</code>
+
+
 ---
 ##### Response if SUCCESSFUL
 Status Code: 200 OK
@@ -1117,8 +1124,8 @@ Just remove the variable all together
 In the deployed version, it can be switched on and off. But must be removed for comercial 
 deployment.
 
-##### ALLOWED_HOST
-In settings.py there is an array that is called ALLOWED_HOST. It is necessary that the **hostname or IP** be added to that array.
+#### ALLOWED_HOSTS
+In settings.py there is an array that is called ALLOWED_HOSTS. It is necessary that the **hostname or IP** be added to that array.
 
 ---
 #### Deployment on heroku
