@@ -26,13 +26,10 @@ class TaskList(generics.ListCreateAPIView):
         'owner__username',
         'title',
         'due_date',
-        'category',
-        'priority',
-        'status',
     ]
     # fields for OrderingFilter
     ordering_fields = [
-        'due_date',        
+        'due_date',
         'priority',
         'status',
     ]
@@ -44,7 +41,7 @@ class TaskList(generics.ListCreateAPIView):
         'priority',
         'status',
     ]
-    
+
     def get_queryset(self):
         """ override the queryset """
         user_id = self.request.user.id
