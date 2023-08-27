@@ -767,9 +767,11 @@ Fields:
 - **category** A number from 0 to 2 (0- Chore, 1- Errand, 2- Work)
 - **priority** A number from 0 to 2 (0- High, 1- Middle, 2- Low)
 - **status** A number from 0 to 2 (0- Open, 1- Progressing, 2- Done)
-- **file** URL of a image file that was attached to the task or **null**
+- **file** image file ("jpg", "png", "webp", "bmp") or **null**
 
+**NOTE! Use form-data if you want to upload an image file in the request**
 ---
+
 ##### Response if SUCCESSFUL
 Status Code: 200 OK
 
@@ -875,6 +877,8 @@ Body:
 }
 </code>
 
+**NOTE! Use form-data if you want to upload an image file in the request**
+
 Fields:
 The **nullable fields** must have an **empty string** if you want them to be blank.
 The **required fields**, which are title, due_date, category, priority and status, must be supplied in the request. 
@@ -888,7 +892,7 @@ The **required fields**, which are title, due_date, category, priority and statu
 - **category** A number from 0 to 2 (0- Chore, 1- Errand, 2- Work)
 - **priority** A number from 0 to 2 (0- High, 1- Middle, 2- Low)
 - **status** A number from 0 to 2 (0- Open, 1- Progressing, 2- Done)
-- **file** URL of a image file that was attached to the task or **null**
+- **file** image file ("jpg", "png", "webp", "bmp") or **null**
 
 If the task is not found the **Response** will have the status **400** Bad Request
 
