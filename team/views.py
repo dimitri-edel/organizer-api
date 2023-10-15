@@ -12,7 +12,6 @@ from .serializers import TeamSerializer, TeamMembershipSerializer
 # pylint: disable=E1101
 # pylint: disable=unused-argument
 
-
 class TeamList(generics.ListCreateAPIView):
     """ TeamList provides a view for listing teams and a post method for creating teams"""
     # TeamList allows user to view teams, or create their own teams

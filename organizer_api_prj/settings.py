@@ -29,7 +29,8 @@ SECRET_KEY = os.environ['SECRET_KEY']
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = 'DEV' in os.environ
 
-ALLOWED_HOSTS = ['127.0.0.1', 'organizer-api-f1f640e8d82c.herokuapp.com', 'organizer-second-826e64e1ee6e.herokuapp.com']
+ALLOWED_HOSTS = ['127.0.0.1', 'organizer-api-f1f640e8d82c.herokuapp.com', 'organizer-second-826e64e1ee6e.herokuapp.com',\
+    '8000-dimitriedel-organizerap-2z0156o1rt1.ws-eu104.gitpod.io']
 
 # CLOUDINARY
 CLOUDINARY_STORAGE = {

@@ -31,7 +31,7 @@ For linting the code I used pylint to validate the code. Thus, it is mandatory t
 ---
 
 ## MODEL
-Here is a sketch of how the model types are related to eachother.
+Here is a sketch of how the model types are related to each other.
 
 ![Model](images/organizer_model.jpg)
 
