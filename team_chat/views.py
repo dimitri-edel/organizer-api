@@ -8,19 +8,28 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 # from rest_framework import generics, filters
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+# from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 # from django.db.models import Q
 # from django_filters.rest_framework import DjangoFilterBackend
-# from organizer_api_prj.permissions import IsOwnerOrTeamMemberOrReadOnly
+from organizer_api_prj.permissions import IsTeamAccessAuthorized
 from team.models import Team, Membership
 from .serializers import TeamMessageSerializer
 from .models import TeamMessage
 
 
 class TeamChat(APIView):
+    """View for retrieving messages in a team chat room
+
+    Args:
+        APIView (View): Provides an APIView class that is the base of all views in REST framework.
+
+    """
+
+    # Data serializer for the class TeamMessage
     serializer_class = TeamMessageSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    # The class that holds permissions to the team chat for users
+    permission_classes = [IsTeamAccessAuthorized]
 
     def get(self, request, team_id):
         """Process the GET request
@@ -33,33 +42,12 @@ class TeamChat(APIView):
             Serialized JSON: List of messages in the respective team chat
         """
         team = Team.objects.get(id=team_id)
-        if not self.check_auth(team, request.user):
-            return Response(status=status.HTTP_400_BAD_REQUEST)
 
         teams = TeamMessage.objects.filter(team=team)
         serializer = TeamMessageSerializer(
             teams, many=True, context={"request": request}
         )
         return Response(serializer.data)
-
-    def check_auth(self, team, user):
-        """
-        Check if the user requesting the list of entries in the chat room
-        is permitted to do it.
-        The user is allowed to make this request if they are either a member
-        of the team or if they are the owner of the team.
-        """
-        # See if the user is member of the requested team
-        membership = Membership.objects.get(team=team, member_id=user.id)
-        # See if the user if the owner of the team
-        team_owner = team.owner is user
-
-        # If the user is neither the owner of the team nor a member,
-        # deny access
-        if not membership and not team_owner:
-            return False
-        # Otherwise grant access
-        return True
 
 
 # class TeamChatPost(APIView):
