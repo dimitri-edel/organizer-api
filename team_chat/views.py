@@ -13,7 +13,7 @@ from rest_framework.views import APIView
 # from django.db.models import Q
 # from django_filters.rest_framework import DjangoFilterBackend
 from organizer_api_prj.permissions import IsTeamAccessAuthorized
-from team.models import Team, Membership
+from team.models import Team
 from .serializers import TeamMessageSerializer
 from .models import TeamMessage
 
@@ -50,60 +50,56 @@ class TeamChat(APIView):
         return Response(serializer.data)
 
 
-# class TeamChatPost(APIView):
-#     """View for posting messages in a team chat
+class TeamChatPost(APIView):
+    """View for posting messages in a team chat
 
-#     Args:
-#         APIView (APIView): DRF view that supports all the  types of requests
+    Args:
+        APIView (APIView): DRF view that supports all the  types of requests
 
-#     Returns:
-#         HTTP Response: If the posted data was valid, the response status will
-#         be 201 for CREATED and the response data will contain the JSON object
-#         with the created dataset
-#     """
+    Returns:
+        HTTP Response: If the posted data was valid, the response status will
+        be 201 for CREATED and the response data will contain the JSON object
+        with the created dataset
+    """
 
-#     serializer_class = TeamMessageSerializer
-#     permission_classes = [IsAuthenticatedOrReadOnly]
+    # Data serializer for the class TeamMessage
+    serializer_class = TeamMessageSerializer
+    # The class that holds permissions to the team chat for users
+    permission_classes = [IsTeamAccessAuthorized]
 
-#     def post(self, request):
-#         """Process the POST request
+    def post(self, request, team_id):
+        """Process the POST request
 
-#         Args:
-#             request (HTTP request): The request from the client
+        Args:
+            request (HTTP request): The request from the client
+            team_id (Integer): The private key of the team, which
+            the write request is referring to. Even though, the
+            team-id is also part of the submitted form, I made it
+            part of the URL route, so I do not have to create a
+            separate permission class. Meaning that the permission
+            class uses the team_id parameter of a view class to
+            determine if the user requesting access is allowed to
+            do so.
+            IMPORTANT: The team-id that is sent in a HTML-form
+            or a JSON-object, will be overwritten inside this
+            method to match the requested team in the URL route.
 
-#         Returns:
-#             HTTP Response: If the posted data was valid, the response status will
-#         be 201 for CREATED and the response data will contain the JSON object
-#         with the created dataset
-#         """
-#         serializer = TeamMessageSerializer(
-#             data=request.data, context={"request": request}
-#         )
+        Returns:
+            HTTP Response: If the posted data was valid, the response status will
+        be 201 for CREATED and the response data will contain the JSON object
+        with the created dataset
+        """
+        serializer = TeamMessageSerializer(
+            data=request.data, context={"request": request}
+        )
+        # Retrieve the respective team object
+        team = Team.objects.get(id=team_id)
 
-#         if serializer.is_valid():
-#             serializer.save(owner=request.user)
-#             return Response(serializer.data, status=status.HTTP_201_CREATED)
+        if serializer.is_valid():
+            serializer.save(owner=request.user, team=team)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-#     def check_auth(self, team, user):
-#         """
-#         Check if the user requesting the list of entries in the chat room
-#         is permitted to do it.
-#         The user is allowed to make this request if they are either a member
-#         of the team or if they are the owner of the team.
-#         """
-#         # See if the user is member of the requested team
-#         membership = Membership.objects.get(team=team, member_id=user.id)
-#         # See if the user if the owner of the team
-#         team_owner = team.owner is user
-
-#         # If the user is neither the owner of the team nor a member,
-#         # deny access
-#         if not membership and not team_owner:
-#             return False
-#         # Otherwise grant access
-#         return True
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 # class TeamChat(generics.ListCreateAPIView):
