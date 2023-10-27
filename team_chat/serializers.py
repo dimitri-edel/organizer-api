@@ -16,6 +16,14 @@ class TeamMessageSerializer(serializers.ModelSerializer):
     # name of the user
     owner = serializers.ReadOnlyField(source="owner.username")
 
+    def update(self, instance, validated_data):
+        """Override the update method to meet the update requirements"""
+
+        instance.message = validated_data.get("message")
+        instance.image = validated_data.get("image")
+        instance.save()
+        return instance
+
     class Meta:
         """Meta data for the model serialization"""
 

@@ -1,8 +1,10 @@
 """ List of permissions for users """
 # pylint:disable=E1101
 # pylint:disable=broad-except
+# pylint:disable=no-name-in-module
 from rest_framework import permissions
 from team.models import Team, Membership
+from team_chat.models import TeamMessage
 
 
 class IsOwnerOrReadOnly(permissions.BasePermission):
@@ -62,6 +64,39 @@ class IsOwnerTeammateOrReadOnly(permissions.BasePermission):
         # Membership.member
         # also grant access, otherwise do not!
         return (obj.a == request.user) or (obj.owner == request.user)
+
+
+class IsTeamChatMessageOwner(permissions.BasePermission):
+    """Grant permission to the owner of the message in a team chat"""
+
+    # Override the method of BasePermission
+    def has_permission(self, request, view):
+        """Check permissions for the user of the request.
+        The URL route holds the primary key of the message.
+
+        Args:
+            request (HTTP-Request object): GET, POST, PUT, DELETE requests
+            view (APIView): Â View in team_chat app
+
+        Returns:
+            Boolean: True if the permission is granted. False if the permission
+            is denied.
+        """
+        try:
+            # Retrieve the message id from the parameters of the view
+            message_id = view.kwargs.get("message_id", None)
+            # Retrieve the message object
+            message = TeamMessage.objects.get(id=message_id)
+            if message.owner.id is not request.user.id:
+                return False
+
+        except Exception:
+            # If an exception is encountered, it is only
+            # because the request was anonymous, thus
+            # deny access
+            return False
+        # Otherwise grant access
+        return True
 
 
 class IsTeamAccessAuthorized(permissions.BasePermission):

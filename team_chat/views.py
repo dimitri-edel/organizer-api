@@ -12,7 +12,7 @@ from rest_framework.views import APIView
 
 # from django.db.models import Q
 # from django_filters.rest_framework import DjangoFilterBackend
-from organizer_api_prj.permissions import IsTeamAccessAuthorized
+from organizer_api_prj.permissions import IsTeamAccessAuthorized, IsTeamChatMessageOwner
 from team.models import Team
 from .serializers import TeamMessageSerializer
 from .models import TeamMessage
@@ -98,6 +98,52 @@ class TeamChatPost(APIView):
         if serializer.is_valid():
             serializer.save(owner=request.user, team=team)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class TeamChatPut(APIView):
+    """View for updating messages in a team chat
+
+    Args:
+        APIView (APIView): DRF view that supports all the  types of requests
+
+    Returns:
+        HTTP Response: If the posted data was valid, the response status will
+        be 200 for OK and the response data will contain the JSON object
+        with the updated fields
+    """
+
+    # Data serializer for the class TeamMessage
+    serializer_class = TeamMessageSerializer
+    # The permission class that determines whether or not
+    # the user requesting to update the message is its owner
+    permission_classes = [IsTeamChatMessageOwner]
+
+    def put(self, request, message_id):
+        """Process the PUT request
+
+        Args:
+            request (HTTP request): The request from the client
+            message_id (Integer): The private key of the message, which
+            the write request is referring to.
+
+        Returns:
+            HTTP Response: If the posted data was valid, the response status will
+        be 200 for OK and the response data will contain the JSON object
+        with the updated dataset
+        """
+
+        # Get the instance of the message
+        message = TeamMessage.objects.get(id=message_id)
+        print(f"message-id: {message.id} team: {message.team}")
+        serializer = TeamMessageSerializer(
+            data=request.data, context={"request": request}
+        )
+
+        if serializer.is_valid():
+            serializer.update(instance=message, validated_data=request.data)
+            return Response(serializer.data, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
