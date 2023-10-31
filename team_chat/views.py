@@ -3,16 +3,22 @@
 # pylint: disable=unused-argument
 # pylint: disable=E0611
 
+from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-# from rest_framework import generics, filters
+from rest_framework import generics, filters
+
 # from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 # from django.db.models import Q
-# from django_filters.rest_framework import DjangoFilterBackend
-from organizer_api_prj.permissions import IsTeamAccessAuthorized, IsTeamChatMessageOwner
+from django_filters.rest_framework import DjangoFilterBackend
+from organizer_api_prj.permissions import (
+    IsTeamAccessAuthorized,
+    IsTeamChatMessageOwner,
+    IsOwnerOrTeamMemberOrReadOnly,
+)
 from team.models import Team
 from .serializers import TeamMessageSerializer
 from .models import TeamMessage
@@ -42,10 +48,17 @@ class TeamChat(APIView):
             Serialized JSON: List of messages in the respective team chat
         """
         team = Team.objects.get(id=team_id)
+        username = request.GET.get("username")
+        # Get the entire set messages for the requested team
+        messages = TeamMessage.objects.filter(team=team)
 
-        teams = TeamMessage.objects.filter(team=team)
+        if username is not None:
+            owner = User.objects.get(username=username)
+            # Filter the set of messages by user
+            messages = messages.filter(owner=owner)
+        # print(f"owner={owner.username}")
         serializer = TeamMessageSerializer(
-            teams, many=True, context={"request": request}
+            messages, many=True, context={"request": request}
         )
         return Response(serializer.data)
 
@@ -192,20 +205,44 @@ class TeamChatDelete(APIView):
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-# class TeamChat(generics.ListCreateAPIView):
-#     """
-#     This generic view allows users to view messages of in the chat
-#     or post new messages
-#     """
+class TeamChatList(generics.ListAPIView):
+    """
+    This generic view allows users to view messages of in the chat
+    or post new messages
+    """
 
-#     # Only allow users who are members of the team or their
-#     # owners to create and view the messages
-#     permission_classes = [IsOwnerOrTeamMemberOrReadOnly]
-#     # The serializer of the model objects for HTML Response objects
-#     serializer_class = TeamMessageSerializer
-#     # Retrieve all messages that are permitted to the user
-#     queryset = TeamMessage.objects.all()
+    model = TeamMessage
+    # Only allow users who are members of the team or their
+    # owners to create and view the messages
+    permission_classes = [IsOwnerOrTeamMemberOrReadOnly]
+    # The serializer of the model objects for HTML Response objects
+    serializer_class = TeamMessageSerializer
+    # Retrieve all messages that are permitted to the user
+    # queryset = TeamMessage.objects.all()
+    filter_backends = [
+        filters.SearchFilter,
+        DjangoFilterBackend,
+    ]
+    # fields for SearchFilter
+    search_fields = [
+        "owner__username",
+    ]
+    # fields for DjangoFilterBackend
+    filterset_fields = [
+        "owner__username",
+    ]
 
-#     def perform_create(self, serializer):
-#         """Method for posting a new message in the team chat room"""
-#         serializer.save(owner=self.request.user)
+    # def perform_create(self, serializer):
+    #     """Method for posting a new message in the team chat room"""
+    #     serializer.save(owner=self.request.user)
+
+    def get_queryset(self):
+        team_id = self.request.GET.get("team_id")
+        if team_id is None:
+            return TeamMessage.objects.none()
+
+        team = Team.objects.get(id=team_id)
+
+        messages = TeamMessage.objects.filter(team=team)
+
+        return messages
