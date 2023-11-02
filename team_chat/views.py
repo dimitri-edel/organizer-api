@@ -209,6 +209,9 @@ class TeamChatList(generics.ListAPIView):
     """
     This generic view allows users to view messages of in the chat
     or post new messages
+    Filters: owner__username - allows to filter the messages by the
+    username of the user who posted them
+    Pagination parameters: limit, offset, page
     """
 
     model = TeamMessage
