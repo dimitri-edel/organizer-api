@@ -20,7 +20,10 @@ class TeamMessageSerializer(serializers.ModelSerializer):
         """Override the update method to meet the update requirements"""
 
         instance.message = validated_data.get("message")
-        instance.image = validated_data.get("image")
+
+        if validated_data.get("image"):
+            instance.image = validated_data.get("image")
+
         instance.save()
         return instance
 
