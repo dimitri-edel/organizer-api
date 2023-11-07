@@ -51,18 +51,9 @@ class TeamChatMessageCount(APIView):
         # username = request.GET.get("username")
         # Get the entire set messages for the requested team
         messages = TeamMessage.objects.filter(team=team)
-
+        # Count the messages
         count = messages.count()
-
-        # if username is not None:
-        #     owner = User.objects.get(username=username)
-        #     # Filter the set of messages by user
-        #     messages = messages.filter(owner=owner)
-        # # print(f"owner={owner.username}")
-        # serializer = TeamMessageSerializer(
-        #     messages, many=True, context={"request": request}
-        # )
-        # return Response(serializer.data)
+        # Return a dictionary with the number of messages found
         return Response({"count": count})
 
 
@@ -232,6 +223,7 @@ class TeamChatList(generics.ListAPIView):
     # fields for SearchFilter
     search_fields = [
         "owner__username",
+        "message",
     ]
     # fields for DjangoFilterBackend
     filterset_fields = [
