@@ -24,7 +24,7 @@ from .serializers import TeamMessageSerializer
 from .models import TeamMessage
 
 
-class TeamChat(APIView):
+class TeamChatMessageCount(APIView):
     """View for retrieving messages in a team chat room
 
     Args:
@@ -48,19 +48,22 @@ class TeamChat(APIView):
             Serialized JSON: List of messages in the respective team chat
         """
         team = Team.objects.get(id=team_id)
-        username = request.GET.get("username")
+        # username = request.GET.get("username")
         # Get the entire set messages for the requested team
         messages = TeamMessage.objects.filter(team=team)
 
-        if username is not None:
-            owner = User.objects.get(username=username)
-            # Filter the set of messages by user
-            messages = messages.filter(owner=owner)
-        # print(f"owner={owner.username}")
-        serializer = TeamMessageSerializer(
-            messages, many=True, context={"request": request}
-        )
-        return Response(serializer.data)
+        count = messages.count()
+
+        # if username is not None:
+        #     owner = User.objects.get(username=username)
+        #     # Filter the set of messages by user
+        #     messages = messages.filter(owner=owner)
+        # # print(f"owner={owner.username}")
+        # serializer = TeamMessageSerializer(
+        #     messages, many=True, context={"request": request}
+        # )
+        # return Response(serializer.data)
+        return Response({"count": count})
 
 
 class TeamChatPost(APIView):
