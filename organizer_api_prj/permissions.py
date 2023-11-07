@@ -116,7 +116,7 @@ class IsTeamAccessAuthorized(permissions.BasePermission):
             Boolean: True if the permission is granted. False if the permission
             is denied.
         """
-        print("TeamAccessAuthorized is executed")
+
         try:
             # Retrieve the team id from the parameters of the view
             team_id = view.kwargs.get("team_id", None)
@@ -127,9 +127,10 @@ class IsTeamAccessAuthorized(permissions.BasePermission):
             membership = Membership.objects.get_or_none(team=team, member=request.user)
             # See if the user is the owner of the team
             team_owner = team.owner is request.user
+
             # If the user is neither the owner of the team nor a member,
             # deny access
-            if not membership is None and not team_owner:
+            if membership is None and not team_owner:
                 return False
         except Exception:
             # If an exception is encountered, it is only
