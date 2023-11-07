@@ -9,6 +9,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from rest_framework import generics, filters
+from datetime import timedelta, datetime
 
 # from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
@@ -230,12 +231,11 @@ class TeamChatList(generics.ListAPIView):
         "owner__username",
     ]
 
-    # def perform_create(self, serializer):
-    #     """Method for posting a new message in the team chat room"""
-    #     serializer.save(owner=self.request.user)
-
     def get_queryset(self):
+        # Extract GET parameter named team_id &team_id=?
         team_id = self.request.GET.get("team_id")
+        # Extract GET parameter named minus_days &minus_days=?
+        minus_days = self.request.GET.get("minus_days")
         if team_id is None:
             return TeamMessage.objects.none()
 
@@ -243,4 +243,14 @@ class TeamChatList(generics.ListAPIView):
 
         messages = TeamMessage.objects.filter(team=team)
 
+        # If minus_days parameter exists and has a valid value
+        if minus_days is not None and int(minus_days) > 0:
+            # Filter the messages to only contain messages
+            # that are older than minus_days
+            # In layman terms, if minus_day equals to 5
+            # then the query will only return the messages
+            # posted in the last 5 days
+            messages = messages.filter(
+                created_at__gte=(datetime.now() - timedelta(days=int(minus_days)))
+            )
         return messages
