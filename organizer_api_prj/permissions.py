@@ -125,8 +125,9 @@ class IsTeamAccessAuthorized(permissions.BasePermission):
 
             # See if the user is member of the requested team
             membership = Membership.objects.get_or_none(team=team, member=request.user)
+
             # See if the user is the owner of the team
-            team_owner = team.owner is request.user
+            team_owner = team.owner == request.user
 
             # If the user is neither the owner of the team nor a member,
             # deny access
