@@ -149,12 +149,12 @@ class TeamMembers(APIView):
         team = Team.objects.get(id=team_id)
 
         memberships = Membership.objects.filter(team=team)
-        data = {}
+        data = []
         for member in memberships:
             user = {}
             user["user_id"] = member.member.id
             user["username"] = member.member.username
-            data[member.member.id] = user
+            data.append(user)
 
         # Return a dictionary with the number of messages found
         return Response(data, status=status.HTTP_200_OK)
