@@ -11,6 +11,7 @@ from django.db.models import Q
 from rest_framework.views import APIView
 from rest_framework import generics, filters
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.permissions import IsAuthenticated
 from organizer_api_prj.permissions import (
     IsTeamAccessAuthorized,
     PrivateMessageListPermission,
@@ -29,8 +30,8 @@ class PrivateChatMessageCount(APIView):
 
     """
 
-    # The class that holds permissions to the team chat for users
-    permission_classes = [PrivateMessageListPermission]
+    # Grant permission to authenticated users
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, team_id, recipient_id):
         """Process the GET request
