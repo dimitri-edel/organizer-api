@@ -28,5 +28,6 @@ urlpatterns = [
     path("dj-rest-auth/registration/", include("dj_rest_auth.registration.urls")),
     path("", include("team.urls")),
     path("", include("team_chat.urls")),
+    path("", include("private_chat.urls")),
     path("", include("task.urls")),
 ]

@@ -140,3 +140,46 @@ class IsTeamAccessAuthorized(permissions.BasePermission):
             return False
         # Otherwise grant access
         return True
+
+
+class PrivateMessageListPermission(permissions.BasePermission):
+    """Permission used for checking authentication for users, who try to retrieve,
+    post, update or delete a message in the team chatroom
+    """
+
+    def has_permission(self, request, view):
+        """Check permissions for the user of the request.
+        The URL route holds the primary key of the team.
+
+        Args:
+            request (HTTP-Request object): GET, POST, PUT, DELETE requests
+            view (APIView): Â View in team_chat app
+
+        Returns:
+            Boolean: True if the permission is granted. False if the permission
+            is denied.
+        """
+
+        try:
+            # Retrieve the team id from the parameters of the view
+            team_id = view.kwargs.get("team_id", None)
+            # Access the requested team
+            team = Team.objects.get(id=team_id)
+
+            # See if the user is member of the requested team
+            membership = Membership.objects.get_or_none(team=team, member=request.user)
+
+            # See if the user is the owner of the team
+            team_owner = team.owner == request.user
+
+            # If the user is neither the owner of the team nor a member,
+            # deny access
+            if membership is None and not team_owner:
+                return False
+        except Exception:
+            # If an exception is encountered, it is only
+            # because the request was anonymous, thus
+            # deny access
+            return False
+        # Otherwise grant access
+        return True
