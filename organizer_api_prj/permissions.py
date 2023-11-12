@@ -5,6 +5,7 @@
 from rest_framework import permissions
 from team.models import Team, Membership
 from team_chat.models import TeamMessage
+from private_chat.models import PrivateMessage
 
 
 class IsOwnerOrReadOnly(permissions.BasePermission):
@@ -162,7 +163,8 @@ class PrivateMessageListPermission(permissions.BasePermission):
 
         try:
             # Retrieve the team id from the parameters of the view
-            team_id = view.kwargs.get("team_id", None)
+            team_id = request.GET.get("team_id", None)
+
             # Access the requested team
             team = Team.objects.get(id=team_id)
 
@@ -183,3 +185,18 @@ class PrivateMessageListPermission(permissions.BasePermission):
             return False
         # Otherwise grant access
         return True
+
+
+class PrivateMessageOwnerPermission(permissions.BasePermission):
+    """Permission for owners of private messages"""
+
+    def has_permission(self, request, view):
+        message_id = view.kwargs.get("message_id", None)
+        # If the user, who requested the access is the owner
+        # of the message, then grant permission,
+        # otherwise deny Access
+        if message_id is not None:
+            message = PrivateMessage.objects.get(id=message_id)
+            if message.owner == request.user:
+                return True
+        return False

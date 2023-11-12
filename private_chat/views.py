@@ -15,6 +15,7 @@ from organizer_api_prj.permissions import (
     IsTeamAccessAuthorized,
     IsOwnerOrTeamMemberOrReadOnly,
     PrivateMessageListPermission,
+    PrivateMessageOwnerPermission,
 )
 from team.models import Team
 from .serializers import PrivateMessageSerializer
@@ -109,50 +110,50 @@ class PrivateChatPost(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# class PrivateChatPut(APIView):
-#     """View for updating messages in a team chat
+class PrivateChatPut(APIView):
+    """View for updating messages in a team chat
 
-#     Args:
-#         APIView (APIView): DRF view that supports all the  types of requests
+    Args:
+        APIView (APIView): DRF view that supports all the  types of requests
 
-#     Returns:
-#         HTTP Response: If the posted data was valid, the response status will
-#         be 200 for OK and the response data will contain the JSON object
-#         with the updated fields
-#     """
+    Returns:
+        HTTP Response: If the posted data was valid, the response status will
+        be 200 for OK and the response data will contain the JSON object
+        with the updated fields
+    """
 
-#     # Data serializer for the class TeamMessage
-#     serializer_class = TeamMessageSerializer
-#     # The permission class that determines whether or not
-#     # the user requesting to update the message is its owner
-#     permission_classes = [IsPrivateChatMessageOwner]
+    # Data serializer for the class TeamMessage
+    serializer_class = PrivateMessageSerializer
+    # The permission class that determines whether or not
+    # the user requesting to update the message is its owner
+    permission_classes = [PrivateMessageOwnerPermission]
 
-#     def put(self, request, message_id):
-#         """Process the PUT request
+    def put(self, request, message_id):
+        """Process the PUT request
 
-#         Args:
-#             request (HTTP request): The request from the client
-#             message_id (Integer): The private key of the message, which
-#             the write request is referring to.
+        Args:
+            request (HTTP request): The request from the client
+            message_id (Integer): The private key of the message, which
+            the write request is referring to.
 
-#         Returns:
-#             HTTP Response: If the posted data was valid, the response status will
-#         be 200 for OK and the response data will contain the JSON object
-#         with the updated dataset
-#         """
+        Returns:
+            HTTP Response: If the posted data was valid, the response status will
+        be 200 for OK and the response data will contain the JSON object
+        with the updated dataset
+        """
 
-#         # Get the instance of the message
-#         message = TeamMessage.objects.get(id=message_id)
+        # Get the instance of the message
+        message = PrivateMessage.objects.get(id=message_id)
 
-#         serializer = TeamMessageSerializer(
-#             data=request.data, context={"request": request}
-#         )
+        serializer = PrivateMessageSerializer(
+            data=request.data, context={"request": request}
+        )
 
-#         if serializer.is_valid():
-#             serializer.update(instance=message, validated_data=request.data)
-#             return Response(serializer.data, status=status.HTTP_200_OK)
+        if serializer.is_valid():
+            serializer.update(instance=message, validated_data=request.data)
+            return Response(serializer.data, status=status.HTTP_200_OK)
 
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 # class PrivateChatDelete(APIView):
@@ -171,7 +172,7 @@ class PrivateChatPost(APIView):
 #     serializer_class = TeamMessageSerializer
 #     # The permission class that determines whether or not
 #     # the user requesting to update the message is its owner
-#     permission_classes = [IsPrivateChatMessageOwner]
+#     permission_classes = [PrivateMessageOwnerPermission]
 
 #     def delete(self, request, message_id):
 #         """Process the DELETE request
@@ -215,7 +216,7 @@ class PrivateChatList(generics.ListAPIView):
     model = PrivateMessage
     # Only allow users who are members of the team or their
     # owners to create and view the messages
-    permission_classes = [IsOwnerOrTeamMemberOrReadOnly]
+    permission_classes = [PrivateMessageListPermission]
     # The serializer of the model objects for HTML Response objects
     serializer_class = PrivateMessageSerializer
     # Retrieve all messages that are permitted to the user
