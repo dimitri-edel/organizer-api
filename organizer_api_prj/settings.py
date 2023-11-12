@@ -103,6 +103,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "team",
     "team_chat",
+    "private_chat",
     "task",
 ]
 SITE_ID = 1  # required for dj_rest_auth
