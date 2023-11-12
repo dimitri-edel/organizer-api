@@ -10,4 +10,5 @@ urlpatterns = [
     path("membership/<int:pk>", views.TeamMembershipDetails.as_view()),
     path("leave/team/<int:team_id>", views.LeaveTeam.as_view()),
     path("team-members/<int:team_id>", views.TeamMembers.as_view()),
+    path("team-members-count/<int:team_id>", views.TeamMembersCount.as_view()),
 ]

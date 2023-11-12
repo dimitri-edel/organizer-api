@@ -131,7 +131,7 @@ class TeamMates(generics.ListAPIView):
 
 
 class TeamMembers(APIView):
-    """List of all memberships for a particular team"""
+    """List of all members for a particular team"""
 
     # The class that holds permissions to the team chat for users
     permission_classes = [IsTeamAccessAuthorized]
@@ -144,7 +144,7 @@ class TeamMembers(APIView):
             team_id (Integer): The PK of the requested team
 
         Returns:
-            Serialized JSON: List of messages in the respective team chat
+            Serialized JSON: List of team member of the respective team
         """
         team = Team.objects.get(id=team_id)
 
@@ -158,3 +158,26 @@ class TeamMembers(APIView):
 
         # Return a dictionary with the number of messages found
         return Response(data, status=status.HTTP_200_OK)
+
+
+class TeamMembersCount(APIView):
+    """Return number of members in a specific team"""
+
+    # The class that holds permissions to the team chat for users
+    permission_classes = [IsTeamAccessAuthorized]
+
+    def get(self, request, team_id):
+        """Process the GET request
+
+        Args:
+            request (GET-Request): The GET request sent by the client
+            team_id (Integer): The PK of the requested team
+
+        Returns:
+            Serialized JSON: List of team member of the respective team
+        """
+        team = Team.objects.get(id=team_id)
+        memberships = Membership.objects.filter(team=team)
+        count = memberships.count()
+        # Return a dictionary with the number of messages found
+        return Response({"count": count}, status=status.HTTP_200_OK)
