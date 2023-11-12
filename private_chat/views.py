@@ -6,14 +6,13 @@
 from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.views import APIView
-from django.db.models import Q
-from rest_framework import generics, filters
 from datetime import timedelta, datetime
+from django.db.models import Q
+from rest_framework.views import APIView
+from rest_framework import generics, filters
 from django_filters.rest_framework import DjangoFilterBackend
 from organizer_api_prj.permissions import (
     IsTeamAccessAuthorized,
-    IsOwnerOrTeamMemberOrReadOnly,
     PrivateMessageListPermission,
     PrivateMessageOwnerPermission,
 )
@@ -156,48 +155,48 @@ class PrivateChatPut(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# class PrivateChatDelete(APIView):
-#     """View for deleting messages in a team chat
+class PrivateChatDelete(APIView):
+    """View for deleting messages in a private chat
 
-#     Args:
-#         APIView (APIView): DRF view that supports all the  types of requests
+    Args:
+        APIView (APIView): DRF view that supports all the  types of requests
 
-#     Returns:
-#         HTTP Response: If the deletion was successful, the response status will
-#         be 200 for OK and the response data will contain the JSON object
-#         with the deleted object
-#     """
+    Returns:
+        HTTP Response: If the deletion was successful, the response status will
+        be 200 for OK and the response data will contain the JSON object
+        with the deleted object
+    """
 
-#     # Data serializer for the class TeamMessage
-#     serializer_class = TeamMessageSerializer
-#     # The permission class that determines whether or not
-#     # the user requesting to update the message is its owner
-#     permission_classes = [PrivateMessageOwnerPermission]
+    # Data serializer for the class TeamMessage
+    serializer_class = PrivateMessageSerializer
+    # The permission class that determines whether or not
+    # the user requesting to update the message is its owner
+    permission_classes = [PrivateMessageOwnerPermission]
 
-#     def delete(self, request, message_id):
-#         """Process the DELETE request
+    def delete(self, request, message_id):
+        """Process the DELETE request
 
-#         Args:
-#             request (HTTP request): The request from the client
-#             message_id (Integer): The private key of the message, which
-#             the write request is referring to.
+        Args:
+            request (HTTP request): The request from the client
+            message_id (Integer): The private key of the message, which
+            the write request is referring to.
 
-#         Returns:
-#             HTTP Response: If the posted data was valid, the response status will
-#         be 200 for OK and the response data will contain the JSON object
-#         with the updated dataset
-#         """
+        Returns:
+            HTTP Response: If the posted data was valid, the response status will
+        be 200 for OK and the response data will contain the JSON object
+        with the updated dataset
+        """
 
-#         # Get the instance of the message and delete it
-#         message = TeamMessage.objects.get(id=message_id).delete()
-#         # If the deletion was a success, then return the OK status
-#         # and a serialized tuple that indicates the number of objects
-#         # that have been deleted and also contains the type of the object
-#         # which is team_chat.TeamMessage
-#         if message is not None:
-#             return Response(message, status=status.HTTP_200_OK)
-#         # Return a bad request if the deletion did not succeed
-#         return Response(status=status.HTTP_400_BAD_REQUEST)
+        # Get the instance of the message and delete it
+        message = PrivateMessage.objects.get_or_none(id=message_id).delete()
+        # If the deletion was a success, then return the OK status
+        # and a serialized tuple that indicates the number of objects
+        # that have been deleted and also contains the type of the object
+        # which is private_chat.models.PrivateMessage
+        if message is not None:
+            return Response(message, status=status.HTTP_200_OK)
+        # Return a bad request if the deletion did not succeed
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class PrivateChatList(generics.ListAPIView):

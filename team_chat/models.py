@@ -3,6 +3,7 @@ from django.core.validators import FileExtensionValidator
 from django.contrib.auth.models import User
 from django.db import models
 from team.models import Team
+from organizer_api_prj.decorators import GetOrNoneManager
 
 
 class TeamMessage(models.Model):
@@ -27,6 +28,8 @@ class TeamMessage(models.Model):
             FileExtensionValidator(allowed_extensions=["jpg", "png", "webp", "bmp"])
         ],
     )
+
+    objects = GetOrNoneManager()
 
     class Meta:
         """Meta information for the model"""

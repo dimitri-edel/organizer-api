@@ -87,9 +87,10 @@ class IsTeamChatMessageOwner(permissions.BasePermission):
             # Retrieve the message id from the parameters of the view
             message_id = view.kwargs.get("message_id", None)
             # Retrieve the message object
-            message = TeamMessage.objects.get(id=message_id)
-            if message.owner.id is not request.user.id:
-                return False
+            message = TeamMessage.objects.get_or_none(id=message_id)
+            if message is not None:
+                if message.owner.id is not request.user.id:
+                    return False
 
         except Exception:
             # If an exception is encountered, it is only
@@ -196,7 +197,8 @@ class PrivateMessageOwnerPermission(permissions.BasePermission):
         # of the message, then grant permission,
         # otherwise deny Access
         if message_id is not None:
-            message = PrivateMessage.objects.get(id=message_id)
-            if message.owner == request.user:
-                return True
+            message = PrivateMessage.objects.get_or_none(id=message_id)
+            if message is not None:
+                if message.owner == request.user:
+                    return True
         return False

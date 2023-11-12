@@ -21,4 +21,5 @@ urlpatterns = [
         "private-chat-put/<int:message_id>",
         views.PrivateChatPut.as_view(),
     ),
+    path("private-chat-delete/<int:message_id>", views.PrivateChatDelete.as_view()),
 ]

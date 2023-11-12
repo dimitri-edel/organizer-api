@@ -1,7 +1,9 @@
 """"Model for the messages in the team chat room"""
+# pylint: disable=no-name-in-module
 from django.core.validators import FileExtensionValidator
 from django.contrib.auth.models import User
 from django.db import models
+from organizer_api_prj.decorators import GetOrNoneManager
 from team.models import Team
 
 
@@ -33,6 +35,8 @@ class PrivateMessage(models.Model):
             FileExtensionValidator(allowed_extensions=["jpg", "png", "webp", "bmp"])
         ],
     )
+    # Decorator for returning None instead of throwing an exception
+    objects = GetOrNoneManager()
 
     class Meta:
         """Meta information for the model"""
