@@ -7,25 +7,29 @@ from .models import Team, Membership
 
 
 class TeamSerializer(serializers.ModelSerializer):
-    """ Serializer for the Team objects """
+    """Serializer for the Team objects"""
+
     owner = serializers.ReadOnlyField(source="owner.username")
+    owner_id = serializers.ReadOnlyField(source="owner.id")
     is_member = serializers.SerializerMethodField()
 
     class Meta:
-        """" Meta data """
+        """ " Meta data"""
+
         model = Team
         fields = [
-            'id',
-            'owner',
-            'name',
-            'is_member',
+            "id",
+            "owner",
+            "owner_id",
+            "name",
+            "is_member",
         ]
 
     def get_is_member(self, obj):
-        """ Getter for is_member field """
+        """Getter for is_member field"""
         # The request object has been passed as a parameter to the constructor
         # in the views
-        request = self.context['request']
+        request = self.context["request"]
 
         membership = Membership.objects.filter(team=obj, member=request.user)
         is_member = False
@@ -43,26 +47,28 @@ class TeamSerializer(serializers.ModelSerializer):
         except IntegrityError as exc:
             # Due to models.Team.unique_together['owner', 'name]
             # if the user attmpts to add a team twice an IntegrityError will be rasied
-            raise serializers.ValidationError({
-                'detail': 'Cannot create the same team twice!'
-            }) from exc
+            raise serializers.ValidationError(
+                {"detail": "Cannot create the same team twice!"}
+            ) from exc
 
 
 class TeamMembershipSerializer(serializers.ModelSerializer):
-    """ Serializer for Membership objects """
+    """Serializer for Membership objects"""
+
     user_id = serializers.ReadOnlyField(source="member.id")
     member = serializers.ReadOnlyField(source="member.username")
     team_name = serializers.ReadOnlyField(source="team.name")
 
     class Meta:
-        """ Meta data """
+        """Meta data"""
+
         model = Membership
         fields = [
-            'id',
-            'team_name',
-            'team',
-            'user_id',
-            'member',
+            "id",
+            "team_name",
+            "team",
+            "user_id",
+            "member",
         ]
 
     def create(self, validated_data):
@@ -72,6 +78,6 @@ class TeamMembershipSerializer(serializers.ModelSerializer):
         except IntegrityError as exc:
             # Due to models.Memebership.unique_together['team', 'memeber']
             # if the user attmpts to add a team twice an IntegrityError will be rasied
-            raise serializers.ValidationError({
-                'detail': 'Cannot create the same team twice!'
-            }) from exc
+            raise serializers.ValidationError(
+                {"detail": "Cannot create the same team twice!"}
+            ) from exc

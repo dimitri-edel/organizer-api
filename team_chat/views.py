@@ -10,10 +10,6 @@ from rest_framework.views import APIView
 
 from rest_framework import generics, filters
 from datetime import timedelta, datetime
-
-# from rest_framework.permissions import IsAuthenticatedOrReadOnly
-
-# from django.db.models import Q
 from django_filters.rest_framework import DjangoFilterBackend
 from organizer_api_prj.permissions import (
     IsTeamAccessAuthorized,
@@ -33,8 +29,6 @@ class TeamChatMessageCount(APIView):
 
     """
 
-    # Data serializer for the class TeamMessage
-    serializer_class = TeamMessageSerializer
     # The class that holds permissions to the team chat for users
     permission_classes = [IsTeamAccessAuthorized]
 
