@@ -46,10 +46,11 @@ class PrivateChatMessageCount(APIView):
         team = Team.objects.get(id=team_id)
         recipient = User.objects.get(id=recipient_id)
 
-        # username = request.GET.get("username")
-        # Get the entire set messages for the requested team
+        # Get the number of messages exchanged between two users
+        # in a private chat within a particular team
         messages = PrivateMessage.objects.filter(
-            Q(team=team, recipient=recipient) | Q(team=team, owner=request.user)
+            Q(team=team, recipient=recipient, owner=request.user)
+            | Q(team=team, owner=recipient, recipient=request.user)
         )
         # Count the messages
         count = messages.count()
