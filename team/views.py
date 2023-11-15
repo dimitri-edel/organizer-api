@@ -150,6 +150,11 @@ class TeamMembers(APIView):
 
         memberships = Membership.objects.filter(team=team)
         data = []
+        # append the team owner
+        owner = {}
+        owner["user_id"] = team.owner.id
+        owner["username"] = team.owner.username
+        # append all team members
         for member in memberships:
             user = {}
             user["user_id"] = member.member.id
