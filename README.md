@@ -740,7 +740,7 @@ UR: **/team-chat-list/**
 ##### PARAMETERS
 - **search** allows you to search for items by title, username of owner or due_date. For example, /tasks/?search=2023-09 will give you all tasks that are due in September 2023. /tasks/?search=tester will give a list that contains tasks whose title begins with tester or whose owners username begins with tester. However, it will only list either your own tasks or tasks that have been assigned to you by other users.
 - **team_id** the private key of the targeted team.
-- **minus_days**  Filter the messages to only contain messages that are older than minus_days. In layman terms, if minus_days equals to 5 then the query will only return the messages posted in the last 5 days
+- **minus_days**  Filter the messages to only contain messages that are older than minus_days. In other words, if minus_days equals to 5 then the query will only return the messages posted in the last 5 days
 - **limit** number of items per page (pagination)
 - **offset** starting with item number (pagination)
 
@@ -902,12 +902,9 @@ Content-Type: **application/json**
 
 Body:
 <code>
-[
-    1,
-    {
-        "team_chat.TeamMessage": 1
-    }
-]
+{
+    "details": "message deleted!"
+}
 </code>
 
 ##### Response if no PERMISSION
@@ -923,7 +920,206 @@ Body:
 </code>
 
 ---
-#### LIST OF TASKS
+##### Response if message NOT FOUND 
+Status Code: 404 NOT FOUND
+
+---
+## Private Chat
+
+#### LIST OF MESSAGES
+Request-Method : **GET**
+
+UR: **/private-chat-list/**
+
+##### PARAMETERS
+- **search** allows you to search for items by title, username of owner or due_date. For example, /tasks/?search=2023-09 will give you all tasks that are due in September 2023. /tasks/?search=tester will give a list that contains tasks whose title begins with tester or whose owners username begins with tester. However, it will only list either your own tasks or tasks that have been assigned to you by other users.
+- **team_id** the private key of the targeted team.
+- **from_user_id** the private key of the private chat member (who the messages were sent to or from)
+- **minus_days**  Filter the messages to only contain messages that are older than minus_days. In other words, if minus_days equals to 5 then the query will only return the messages posted in the last 5 days
+- **limit** number of items per page (pagination)
+- **offset** starting with item number (pagination)
+
+##### Response if SUCCESSFUL
+Status Code: 200 OK
+
+Content-Type: application/json
+
+Body:
+<code>
+{
+    "count": 2,
+    "next": null,
+    "previous": null,
+    "results": [
+        {
+            "id": 16,
+            "team": 8,
+            "owner": "wo_admin",
+            "recipient": "dj_admin",
+            "message": "hello to dj admin from wo admin",
+            "created_at": "15 Nov 2023 07:09",
+            "image": null
+        },
+        {
+            "id": 17,
+            "team": 8,
+            "owner": "dj_admin",
+            "recipient": "wo_admin",
+            "message": "hello from dj admin",
+            "created_at": "15 Nov 2023 07:43",
+            "image": null
+        }
+    ]
+}
+</code>
+
+The **data** field is paginated. Thus, **count** is the number of entries, **next** is the index of the next page,
+**previous** is the index of the previous page, **results** is the actual data in form of an array.
+
+The array holds a set of dictionaries with the following attributes for each Message:
+**id**:  private key of the message
+**team**: private key of the team
+**owner**: username of the owner
+**recipient**: user with whom them messages were exchanged
+**message**: the text of the message
+**created_at**: "date and time of when the message was posted
+**image**: URL of an image or null
+
+If **no team** with the given **id** is found, the **count** will be **zero**
+
+---
+#### MESSAGE COUNT (Private Chat)
+Request Method: **GET**
+
+URL: **private-chat-message-count/<int:team_id>/<int:recipient_id>**
+
+**recipient_id** signifies the user with whom the messages were exchanged
+
+##### Response if SUCCESSFUL
+Status Code: 200 OK
+
+Content-Type: application/json
+
+Body:
+<code>
+{
+    "count": 5
+}
+</code>
+
+**count** is the total number of messages in the given team chat
+
+---
+#### POST A MESSAGE (Private Chat)
+Request Method: **POST**
+
+Content-Type: **application/json** or **multipart/form-data**
+
+URL : **/private-chat-post/<int:team_id>/<int:recipient_id>**
+
+
+Body:
+<code>
+{
+    "team" : 8
+    "message" : "dj_admin from postman"
+    "image" : null
+}
+</code>
+
+**NOTE! Use form-data if you want to upload an image file in the request**
+
+
+##### Response if SUCCESSFUL
+Status Code: **201 CREATED**
+
+Content-Type: **application/json**
+
+Body:
+<code>
+{
+    "id": 18,
+    "team": 8,
+    "owner": "wo_admin",
+    "recipient": "wo_admin",
+    "message": "dj_admin from postman",
+    "created_at": "15 Nov 2023 20:54",
+    "image": null
+}
+</code>
+
+---
+#### UPDATE A MESSAGE (Private Chat)
+Request Method: **PUT**
+
+Content-Type: **application/json** or **multipart/form-data**
+
+URL : **/private-chat-put/<int:message_id>**
+
+
+Body:
+<code>
+{
+    "team" : 8
+    "message" : "some updated message from postman"
+    "image" : null
+}
+</code>
+
+**NOTE! Use form-data if you want to upload an image file in the request**
+
+
+##### Response if SUCCESSFUL
+Status Code: **200 OK**
+
+Content-Type: **application/json**
+
+Body:
+<code>
+{
+    "team" : 8
+    "message" : "some updated message from postman"
+    "image" : null
+}
+</code>
+
+
+#### DELETE A MESSAGE (Private Chat)
+Request Method: **DELETE**
+
+URL: **/private-chat-delete/<int:message_id>**
+
+##### Response if SUCCESSFUL
+Status Code: 200 OK
+
+Content-Type: **application/json**
+
+Body:
+<code>
+{
+    "details": "message deleted!"
+}
+</code>
+
+##### Response if no PERMISSION
+Status Code: 403 Forbidden
+
+Content-Type: **application/json**
+
+Body:
+<code>
+{
+    "detail": "You do not have permission to perform this action."
+}
+</code>
+
+---
+##### Response if message NOT FOUND 
+Status Code: 404 NOT FOUND
+
+
+---
+#### LIST OF TASKS 
 Request Method: **GET**
 
 URL:  **/tasks/**
