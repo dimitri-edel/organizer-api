@@ -4,8 +4,6 @@
 # pylint: disable=E0611
 
 from datetime import timedelta, datetime
-from django.core.exceptions import ObjectDoesNotExist
-from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
