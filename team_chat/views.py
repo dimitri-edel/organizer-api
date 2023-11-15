@@ -183,16 +183,18 @@ class TeamChatDelete(APIView):
         with the updated dataset
         """
 
-        # Get the instance of the message and delete it
-        message = TeamMessage.objects.get(id=message_id).delete()
+        # Get the instance of the message or a None object if there is
+        # no such message
+        message = TeamMessage.objects.get_or_none(id=message_id)
         # If the deletion was a success, then return the OK status
         # and a serialized tuple that indicates the number of objects
         # that have been deleted and also contains the type of the object
         # which is team_chat.TeamMessage
         if message is not None:
+            message.delete()
             return Response(message, status=status.HTTP_200_OK)
         # Return a bad request if the deletion did not succeed
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 class TeamChatList(generics.ListAPIView):

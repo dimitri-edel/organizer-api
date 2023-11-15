@@ -795,6 +795,107 @@ The array holds a set of dictionaries with the following attributes for each Mes
 **created_at**: "date and time of when the message was posted
 **image**: URL of an image or null
 
+If **no team** with the given **id** is found, the **count** will be **zero**
+
+#### MESSAGE COUNT
+Request Method: **GET**
+
+URL: **team-chat-message-count/<int:team_id>**
+
+##### Response if SUCCESSFUL
+Status Code: 200 OK
+
+Content-Type: application/json
+
+Body:
+<code>
+{
+    "count": 5
+}
+</code>
+
+**count** is the total number of messages in the given team chat
+
+---
+#### POST A MESSAGE
+Request Method: **POST**
+
+Content-Type: **application/json** or **multipart/form-data**
+
+URL : **/team-chat-post/<int:team_id>**
+
+
+Body:
+<code>
+{
+    "team" : 8
+    "message" : "some message from postman"
+    "image" : null
+}
+</code>
+
+**NOTE! Use form-data if you want to upload an image file in the request**
+
+
+##### Response if SUCCESSFUL
+Status Code: **201 CREATED**
+
+Content-Type: **application/json**
+
+Body:
+<code>
+{
+    "id": 44,
+    "team": 8,
+    "owner": "wo_admin",
+    "message": "some message from postman",
+    "created_at": "15 Nov 2023 19:01",
+    "image": null
+}
+</code>
+
+---
+#### UPDATE A MESSAGE
+Request Method: **PUT**
+
+Content-Type: **application/json** or **multipart/form-data**
+
+URL : **/team-chat-put/<int:message_id>**
+
+
+Body:
+<code>
+{
+    "team" : 8
+    "message" : "some updated message from postman"
+    "image" : null
+}
+</code>
+
+**NOTE! Use form-data if you want to upload an image file in the request**
+
+
+##### Response if SUCCESSFUL
+Status Code: **200 OK**
+
+Content-Type: **application/json**
+
+Body:
+<code>
+{
+    "team" : 8
+    "message" : "some updated message from postman"
+    "image" : null
+}
+</code>
+
+
+#### DELETE A MESSAGE
+Request Method: **DELETE**
+
+URL: **/team-chat-delete/<int:message_id>**
+
+
 ---
 #### LIST OF TASKS
 Request Method: **GET**
