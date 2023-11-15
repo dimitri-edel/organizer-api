@@ -3,13 +3,14 @@
 # pylint: disable=unused-argument
 # pylint: disable=E0611
 
+from datetime import timedelta, datetime
+from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from rest_framework import generics, filters
-from datetime import timedelta, datetime
 from django_filters.rest_framework import DjangoFilterBackend
 from organizer_api_prj.permissions import (
     IsTeamAccessAuthorized,
@@ -198,8 +199,8 @@ class TeamChatList(generics.ListAPIView):
     """
     This generic view allows users to view messages of in the chat
     or post new messages
-    Filters: owner__username - allows to filter the messages by the
-    username of the user who posted them
+    Filters: search - allows to filter the messages by the
+    username of the user who posted them or the text in the message
     Pagination parameters: limit, offset, page
     """
 
@@ -233,7 +234,7 @@ class TeamChatList(generics.ListAPIView):
         if team_id is None:
             return TeamMessage.objects.none()
 
-        team = Team.objects.get(id=team_id)
+        team = Team.objects.get_or_none(id=team_id)
 
         messages = TeamMessage.objects.filter(team=team)
 
@@ -241,7 +242,7 @@ class TeamChatList(generics.ListAPIView):
         if minus_days is not None and int(minus_days) > 0:
             # Filter the messages to only contain messages
             # that are older than minus_days
-            # In layman terms, if minus_day equals to 5
+            # In layman terms, if minus_days equals to 5
             # then the query will only return the messages
             # posted in the last 5 days
             messages = messages.filter(

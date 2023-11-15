@@ -1,6 +1,11 @@
 # ORGANIZER API
 
 The API allows a front end application to store and access data for a basic organizer.
+
+## FRONTEND REPOSITORY
+![Open Frontend Repository](https://github.com/dimitri-edel/organizer-react)
+
+---
 ## FEATURES
 ---
 ## Authentication
@@ -329,6 +334,71 @@ The array holds a set of dictionaries with the following attributes for each tea
 - **owner** is the username of the one who owns the team
 - **name** is the name of the team
 - **is_member** is a boolean that signigies whether or not user requesting the information is member of that team
+
+---
+#### LIST OF TEAM-MEMBERS
+Request Method: **GET**
+
+URL: **/team-members/<int:pk>**
+
+##### Response if SUCCESSFUL
+Status Code: 200 OK
+
+Conent-Type: application/json
+
+Body:
+<code>
+[
+    {
+        "user_id": 1,
+        "username": "dj_admin"
+    },
+    {
+        "user_id": 2,
+        "username": "wo_admin"
+    },
+    {
+        "user_id": 14,
+        "username": "eval"
+    }
+]
+</code>
+
+---
+##### Response if no PERMISSION 
+
+This response will also come back if the requested team does not exist, because django's permission classes will come in first. If looking for the team fails an exception will be thrown and the permission will be denied
+
+Status Code: 403 FORBIDDEN
+
+Conent-Type: application/json
+
+Body:
+<code>
+{
+    "detail": "You do not have permission to perform this action."
+}
+</code>
+
+---
+
+#### TEAM MEMBER'S COUNT
+This request is useful for updating the view if new members join the team
+equest Method: **GET**
+
+URL: **/team-members-count/<int:pk>**
+
+##### Response if SUCCESSFUL
+Status Code: 200 OK
+
+Conent-Type: application/json
+
+Body:
+<code>
+{
+    "count": 2
+}
+</code>
 
 ---
 #### CREATE NEW TEAM
@@ -660,7 +730,72 @@ Body:
 </code>
 
 ---
+### Team Chat
 
+#### LIST OF MESSAGES
+Request-Method : **GET**
+
+UR: **/team-chat-list/**
+
+##### PARAMETERS
+- **search** allows you to search for items by title, username of owner or due_date. For example, /tasks/?search=2023-09 will give you all tasks that are due in September 2023. /tasks/?search=tester will give a list that contains tasks whose title begins with tester or whose owners username begins with tester. However, it will only list either your own tasks or tasks that have been assigned to you by other users.
+- **team_id** the private key of the targeted team.
+- **minus_days**  Filter the messages to only contain messages that are older than minus_days. In layman terms, if minus_days equals to 5 then the query will only return the messages posted in the last 5 days
+- **limit** number of items per page (pagination)
+- **offset** starting with item number (pagination)
+
+##### Response if SUCCESSFUL
+Status Code: 200 OK
+
+Content-Type: application/json
+
+Body:
+<code>
+{
+    "count": 5,
+    "next": "https://organizer-api-f1f640e8d82c.herokuapp.com/team-chat-list/?limit=3&offset=3&team_id=8",
+    "previous": null,
+    "results": [
+        {
+            "id": 39,
+            "team": 8,
+            "owner": "dj_admin",
+            "message": "one message from the dev mode altered",
+            "created_at": "15 Nov 2023 06:07",
+            "image": null
+        },
+        {
+            "id": 40,
+            "team": 8,
+            "owner": "dj_admin",
+            "message": "another message from dev mode",
+            "created_at": "15 Nov 2023 06:27",
+            "image": null
+        },
+        {
+            "id": 41,
+            "team": 8,
+            "owner": "dj_admin",
+            "message": "test again",
+            "created_at": "15 Nov 2023 06:49",
+            "image": null
+        }
+    ]
+}
+</code>
+
+The **data** field is paginated. Thus, **count** is the number of entries, **next** is the index of the next page,
+**previous** is the index of the previous page, **results** is the actual data in form of an array.
+
+The array holds a set of dictionaries with the following attributes for each Message:
+**id**:  private key of the message
+**team**: private key of the team
+**owner**: username of the owner
+**message**: the text of the message
+**created_at**: "date and time of when the message was posted
+**image**: URL of an image or null
+
+---
 #### LIST OF TASKS
 Request Method: **GET**
 

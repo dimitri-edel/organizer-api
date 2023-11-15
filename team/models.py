@@ -14,6 +14,8 @@ class Team(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="team_owner")
     # The name of the team
     name = models.CharField(max_length=255, blank=False)
+    # Decorator for returning None instead of Exception if object is not found
+    objects = GetOrNoneManager()
 
     class Meta:
         """Meta data"""

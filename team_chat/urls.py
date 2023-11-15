@@ -1,4 +1,4 @@
-""" Definitions of url patterns """
+""" Definitions of url patterns of team chat"""
 # pylint: disable=E1101
 from django.urls import path
 from . import views
