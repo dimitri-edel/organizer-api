@@ -185,13 +185,10 @@ class TeamChatDelete(APIView):
         # no such message
         message = TeamMessage.objects.get_or_none(id=message_id)
         # If the deletion was a success, then return the OK status
-        # and a serialized tuple that indicates the number of objects
-        # that have been deleted and also contains the type of the object
-        # which is team_chat.TeamMessage
         if message is not None:
             message.delete()
-            return Response(message, status=status.HTTP_200_OK)
-        # Return a bad request if the deletion did not succeed
+            return Response({"details: message deleted!"}, status=status.HTTP_200_OK)
+        # Signal that the message was not found
         return Response(status=status.HTTP_404_NOT_FOUND)
 
 
