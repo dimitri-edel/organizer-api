@@ -895,6 +895,32 @@ Request Method: **DELETE**
 
 URL: **/team-chat-delete/<int:message_id>**
 
+##### Response if SUCCESSFUL
+Status Code: 200 OK
+
+Content-Type: **application/json**
+
+Body:
+<code>
+[
+    1,
+    {
+        "team_chat.TeamMessage": 1
+    }
+]
+</code>
+
+##### Response if no PERMISSION
+Status Code: 403 Forbidden
+
+Content-Type: **application/json**
+
+Body:
+<code>
+{
+    "detail": "You do not have permission to perform this action."
+}
+</code>
 
 ---
 #### LIST OF TASKS
