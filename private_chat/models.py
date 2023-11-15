@@ -1,5 +1,6 @@
 """"Model for the messages in the team chat room"""
 # pylint: disable=no-name-in-module
+# pylint: disable=too-few-public-methods
 from django.core.validators import FileExtensionValidator
 from django.contrib.auth.models import User
 from django.db import models

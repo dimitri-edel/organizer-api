@@ -38,7 +38,9 @@ class IsTeamMemberOrReadOnly(permissions.BasePermission):
 
 
 class IsOwnerOrTeamMemberOrReadOnly(permissions.BasePermission):
-    """Grant permission to the task only to the owner of the task or a teammate"""
+    """
+    Grant permission to the task only to the owner of the task or a teammate
+    """
 
     # Override the method of BasePermission
     def has_object_permission(self, request, view, obj):
@@ -102,8 +104,10 @@ class IsTeamChatMessageOwner(permissions.BasePermission):
 
 
 class IsTeamAccessAuthorized(permissions.BasePermission):
-    """Permission used for checking authentication for users, who try to retrieve,
-    post, update or delete a message in the team chatroom
+    """
+    Permission used for checking authentication for users,
+    who try to retrieve, post, update or delete a message
+    in the team chatroom
     """
 
     def has_permission(self, request, view):
@@ -111,12 +115,13 @@ class IsTeamAccessAuthorized(permissions.BasePermission):
         The URL route holds the primary key of the team.
 
         Args:
-            request (HTTP-Request object): GET, POST, PUT, DELETE requests
+            request (HTTP-Request object): GET, POST, PUT,
+            DELETE requests
             view (APIView): Â View in team_chat app
 
         Returns:
-            Boolean: True if the permission is granted. False if the permission
-            is denied.
+            Boolean: True if the permission is granted.
+            False if the permission is denied.
         """
 
         try:
@@ -145,7 +150,8 @@ class IsTeamAccessAuthorized(permissions.BasePermission):
 
 
 class PrivateMessageListPermission(permissions.BasePermission):
-    """Permission used for checking authentication for users, who try to retrieve,
+    """
+    Permission used for checking authentication for users, who try to retrieve,
     post, update or delete a message in the team chatroom
     """
 

@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from pathlib import Path
 import os
 
+
 if os.path.exists("organizer_api_prj/env.py"):
     from .env import *
 
@@ -119,8 +120,14 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 # Allow Request from ...
+CORS_ALLOWED_ORIGINS = []
+# If there is a deployed origin
+if "DEPLOYED_ORIGIN" in os.environ:
+    CORS_ALLOWED_ORIGINS.append(os.environ.get("DEPLOYED_ORIGIN"))
+# If there is a client origin (development)
 if "CLIENT_ORIGIN" in os.environ:
-    CORS_ALLOWED_ORIGINS = [os.environ.get("CLIENT_ORIGIN")]
+    CORS_ALLOWED_ORIGINS.append(os.environ.get("CLIENT_ORIGIN"))
+
 
 CORS_ALLOW_CREDENTIALS = True
 

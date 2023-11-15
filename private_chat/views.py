@@ -2,16 +2,15 @@
 # pylint: disable=E1101
 # pylint: disable=unused-argument
 # pylint: disable=E0611
-
-from django.contrib.auth.models import User
-from rest_framework import status
-from rest_framework.response import Response
 from datetime import timedelta, datetime
 from django.db.models import Q
+from django.contrib.auth.models import User
+from rest_framework.permissions import IsAuthenticated
+from rest_framework import status
+from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import generics, filters
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.permissions import IsAuthenticated
 from organizer_api_prj.permissions import (
     IsTeamAccessAuthorized,
     PrivateMessageListPermission,
@@ -26,7 +25,8 @@ class PrivateChatMessageCount(APIView):
     """View for retrieving messages in a team chat room
 
     Args:
-        APIView (View): Provides an APIView class that is the base of all views in REST framework.
+        APIView (View): Provides an APIView class that is
+        the base of all views in REST framework.
 
     """
 

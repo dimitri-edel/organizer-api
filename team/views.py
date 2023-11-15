@@ -92,7 +92,10 @@ class TeamMembershipDetails(generics.RetrieveAPIView):
 
 
 class LeaveTeam(APIView):
-    """LeaveTeam allows the user to quit(delete) a team membership by providing the team_id in the request"""
+    """
+    LeaveTeam allows the user to quit(delete) a team membership by providing
+    the team_id in the request
+    """
 
     # Attribute of APIView that creates a form for the object
     serializer_class = TeamSerializer
