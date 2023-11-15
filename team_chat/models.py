@@ -34,5 +34,5 @@ class TeamMessage(models.Model):
     class Meta:
         """Meta information for the model"""
 
-        # order messages by the date and time they were created in descending order
-        ordering = ["-created_at"]
+        # order messages by the date and time they were created in ascending order
+        ordering = ["created_at"]
