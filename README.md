@@ -2,25 +2,25 @@
 
 The API allows a front end application to store and access data for a basic organizer.
 
-## FRONTEND REPOSITORY
-![Open Frontend Repository](https://github.com/dimitri-edel/organizer-react)
+# FRONTEND REPOSITORY
+[Open Frontend Repository](https://github.com/dimitri-edel/organizer-react)
 
 ---
-## FEATURES
+# FEATURES
 ---
-## Authentication
+# Authentication
 Users can register with the API. Upon registration they can sign in or out, using their credentials.
 [See URL Requests for Authentication](#authentication)
 
 ---
 
-### Forming Teams
+## Forming Teams
 Authenticated users can create Teams. A Team entity contains the id of the user whoe created it and the name of the team. The user who created the team can also rename it or delete it. [See URL Requests for Forming Teams](#forming-teams)
 Authenticated users can [view a list of teams](#list-of-teams), [join teams](#create-memebership), [leave teams](#quit-membership).
 
 ---
 
-### Task Management
+## Task Management
 Authenticated users can [list](#list-of-tasks), [create](#create-task), [edit](#update-task-by-id), 
 [retrieve](#retrieve-task-by-id) and [delete](#delete-task-by-id) Tasks.
 
@@ -30,26 +30,47 @@ retrieve a list of teammates with their IDs.
 
 ---
 
-### PEP8 and Pylint
+## Team Chat
+Users who are members of a Team can exchange messages in a Team Chat. The API provides the following possibilities :
+- [list messages](#list-of-messages) 
+- [post messages](#post-a-message) 
+- [edit messages](#update-a-message)
+- [delete message](#delete-a-message)
+- [get a total number of messages](#message-count)
+
+---
+
+## Private Chat
+Users who are members of a Team can exchange private messages in a Private Chat Room. The API provides the following possibilities:
+- [list messages](#list-of-messages-1)
+- [post messages](#post-a-message-private-chat)
+- [edit messages](#update-a-message-private-chat)
+- [delete messages](#delete-a-message-private-chat)
+- [get a total number of messages](#message-count-private-chat)
+
+
+## 
+
+## PEP8 and Pylint
 For linting the code I used pylint to validate the code. Thus, it is mandatory that Pylint be used to validate the code on another machine, because it was necessary to apply a few instructions for that tool in the code. For instance, it does not recognize dynamically attached properties and will throw an error, even if the property is valid.
 
 ---
 
-## MODEL
+# MODEL
 Here is a sketch of how the model types are related to each other.
 
 ![Model](images/erd.png)
 
 ---
 
-## URL ROUTES FOR REQUESTS
+# URL ROUTES FOR REQUESTS
 
 All of the following URLs must be appended to the **ROOT URL** of the API.
 **ROOT URL** [deployedURL]
 
-### Authentication
+## Authentication
 
-#### REGISTRATION
+### REGISTRATION
 ---
 Request Method: **POST**
 
@@ -73,7 +94,7 @@ Required fields:
 
 ---
 
-##### Response if SUCCESSFUL
+#### Response if SUCCESSFUL
 Status Code: 201 Created
 
 Content-Type: **application/json**
@@ -88,7 +109,7 @@ Body:
 
 ---
 
-##### ERROR User already exists
+#### ERROR User already exists
 Status Code: 400 Bad Request
 
 Content-Type: **application/json**
@@ -103,7 +124,7 @@ Body:
 </code>
 
 ---
-##### ERROR Password validation errors
+#### ERROR Password validation errors
 Status Code: 400 Bad Request
 
 Content-Type: **application/json**
@@ -130,7 +151,7 @@ If password1 and password2 don't match the Body will look like this:
 
 ---
 
-#### LOGIN
+### LOGIN
 ---
 Request Method: **POST**
 
@@ -148,7 +169,7 @@ Body:
 
 
 ---
-##### Response if SUCCESSFUL
+#### Response if SUCCESSFUL
 Status Code: 200 OK
 
 Content-Type: **application/json**
@@ -163,7 +184,7 @@ Body:
 </code>
 
 ---
-##### Respoonse if no password was provided
+#### Response if no password was provided
 Status Code: 400 Bad Request
 
 Content-Type: **application/json**
@@ -178,7 +199,7 @@ Body:
 </code>
 
 ---
-##### Respoonse if the username and password do not exist
+#### Response if the username and password do not exist
 Status Code: 400 Bad Request
 
 Content-Type: **application/json**
@@ -193,7 +214,7 @@ Body:
 </code>
 
 ---
-#### LOGOUT
+### LOGOUT
 Request Method: **POST**
 
 URL : **/dj-rest-auth/logout/**
@@ -202,7 +223,7 @@ URL : **/dj-rest-auth/logout/**
 
 ---
 
-#### USER AND ACCESS TOKENS
+### USER AND ACCESS TOKENS
 **Request user data for for an authenticated user**
 
 Request Method: **GET**
@@ -212,7 +233,7 @@ URL:  **/dj-rest-auth/user/**
 **No Payload required**
 
 ---
-##### Response if SUCCESSFUL
+#### Response if SUCCESSFUL
 Status Code: 200 OK
 
 Content-Type: **application/json**
@@ -231,7 +252,7 @@ Body:
 **Access tokens** will also be attached to the response in **cookies**.
 
 ---
-##### Response if NOT LOGGED IN
+#### Response if NOT LOGGED IN
 Status Code: 401 Unauthorized
 
 Content-Type: **application/json**
@@ -244,7 +265,7 @@ Body:
 </code>
 
 ---
-#### REFRESH ACCESS TOKENS
+### REFRESH ACCESS TOKENS
 Request Method: **POST**
 
 URL: **/dj-rest-auth/token/refresh/**
@@ -252,7 +273,7 @@ URL: **/dj-rest-auth/token/refresh/**
 **No Payload required, except for the cookies in the request**
 
 ---
-##### Response if NOT LOGGED IN
+#### Response if NOT LOGGED IN
 Status Code: 401 Unauthorized
 
 Content-Type: **application/json**
@@ -266,7 +287,7 @@ Body:
 </code>
 
 ---
-##### Response if SUCCESSFUL
+#### Response if SUCCESSFUL
 Status Code: 200 OK
 
 Content-Type: **application/json**
@@ -282,23 +303,23 @@ Body:
 **Access tokens** will be attached to the **Cookies** in the Response as well.
 
 ---
-### Team app
+## Team app
 
 **The following URLs will only work for authenticated users!**
 ---
-#### LIST OF TEAMS
+### LIST OF TEAMS
 Request Method: **GET**
 
 URL: **/team/**
 
-##### PARAMETERS
+#### PARAMETERS
 - **search** filters the list by username and name of the team. For example: "/team/?search=dj" will give you a list of all teams whose name begin with dj or whose owners username begins with dj
 - **ordering** orders the list by  name. For example "team/?search=dj&ordering=name will give you a list of teams whose owners username begins with dj or whose name begins with dj. The list will be ordered by username in ascending order. If you want the filter to order in descending order just add a **-** at the front like so: ordering=-name.
 - **name** or **owner__username** will filter the results by either name of team or username of its owner
 - **offset** and **limit** are used for pagination. By default the pagination is set to offset=0 and limit=3. Which means that each page will have three items. But if you want to up the number of items you can just set limit=[a number]. For instance, if I want to have 5 items per page and want to begin with the third entry: &offset=2&limit=5
 
 ---
-##### Response
+#### Response
 Status Code: 200 OK
 
 Conent-Type: application/json
@@ -336,12 +357,12 @@ The array holds a set of dictionaries with the following attributes for each tea
 - **is_member** is a boolean that signigies whether or not user requesting the information is member of that team
 
 ---
-#### LIST OF TEAM-MEMBERS
+### LIST OF TEAM-MEMBERS
 Request Method: **GET**
 
 URL: **/team-members/<int:pk>**
 
-##### Response if SUCCESSFUL
+#### Response if SUCCESSFUL
 Status Code: 200 OK
 
 Conent-Type: application/json
@@ -365,7 +386,7 @@ Body:
 </code>
 
 ---
-##### Response if no PERMISSION 
+#### Response if no PERMISSION 
 
 This response will also come back if the requested team does not exist, because django's permission classes will come in first. If looking for the team fails an exception will be thrown and the permission will be denied
 
@@ -382,13 +403,13 @@ Body:
 
 ---
 
-#### TEAM MEMBER'S COUNT
+### TEAM MEMBER'S COUNT
 This request is useful for updating the view if new members join the team
 equest Method: **GET**
 
 URL: **/team-members-count/<int:pk>**
 
-##### Response if SUCCESSFUL
+#### Response if SUCCESSFUL
 Status Code: 200 OK
 
 Conent-Type: application/json
@@ -401,7 +422,7 @@ Body:
 </code>
 
 ---
-#### CREATE NEW TEAM
+### CREATE NEW TEAM
 Request Method **POST**
 
 Content-Type: **application/json** or **multipart/form-data**
@@ -411,7 +432,7 @@ URL: **/team/**
 Body: **{ "name":"name of team" }**
 
 ---
-##### Response if SUCCESSFUL
+#### Response if SUCCESSFUL
 Status Code: 200 OK
 
 Conent-Type: application/json
@@ -441,7 +462,7 @@ Body:
 </code>
 
 ---
-##### Response if NAME FIELD IS EMPTY
+#### Response if NAME FIELD IS EMPTY
 Status Code: 400 Bad Request
 
 Conent-Type: application/json
@@ -456,13 +477,13 @@ Body:
 </code>
 
 ---
-#### RETRIEVE TEAM
+### RETRIEVE TEAM
 Request Method: **GET**
 
 URL: **/team/<int:pk>/**, where the private key(ID) of the team msut be specified in the path
 
 ---
-##### Response if SUCCESSFUL
+#### Response if SUCCESSFUL
 Status Code: 200 OK
 
 Content-Type: application/json
@@ -483,7 +504,7 @@ Fields:
 - **is_member** is a boolean value that specified if the user in the request is a member of that team
 
 ---
-###### Response if NOT FOUND
+##### Response if NOT FOUND
 Status Code: 404 Not Found
 
 Content-Type: application/json
@@ -496,7 +517,7 @@ Body:
 </code>
 
 ---
-#### UPDATE TEAM
+### UPDATE TEAM
 Request Method: **PUT**
 
 URL:  **/team/<int:pk>/** pk is the private key of the team, which is an integer value
@@ -506,7 +527,7 @@ Content-Type: **application/json** or **multipart/form-data**
 Body:  **{ "name": "new value" }**
 
 ---
-##### Response if SUCCESSFUL
+#### Response if SUCCESSFUL
 Status Code: 200 OK
 
 Content-Type: **application/json**
@@ -528,7 +549,7 @@ Fields:
 - **is_member** is a boolean value that specified if the user in the request is a member of that team
 
 ---
-##### Response if NAME FIELD IS EMPTY
+#### Response if NAME FIELD IS EMPTY
 Status Code: 400 Bad Request
 
 Content-Type: **application/json**
@@ -543,7 +564,7 @@ Body:
 </code>
 
 ---
-#### DELETE TEAM
+### DELETE TEAM
 Request Method: **DELETE**
 
 URL:  **/team/<int:pk>/** pk is the private key of the team, which is an integer value
@@ -551,11 +572,11 @@ URL:  **/team/<int:pk>/** pk is the private key of the team, which is an integer
 **No Payload required**
 
 ---
-##### Response if SUCCESSFUL
+#### Response if SUCCESSFUL
 Status Code: 204 No Conent
 
 ---
-###### Response if NOT FOOUND
+##### Response if NOT FOOUND
 Status Code: 404 Not Found
 
 Content-Type: application/json
@@ -568,14 +589,14 @@ Body:
 </code>
 
 ---
-#### LIST OF TEAMMATES
+### LIST OF TEAMMATES
 Request Method: **GET**
 
 URL: **/teammates/** 
 
 **No Payload required**
 
-##### Response if SUCCESSFUL
+#### Response if SUCCESSFUL
 Status Code : 200 OK
 
 Contenxt-Type: application/json
@@ -615,7 +636,7 @@ The array holds a set of dictionaries with the following attributes for each tea
 - **member** is the username of the teammate
 
 ---
-#### LIST OF TEAM MEMBERSHIPS
+### LIST OF TEAM MEMBERSHIPS
 **NOTE! The list will only contain teams that the are not owned by the user in the request!**
 
 Request Method: **GET**
@@ -625,7 +646,7 @@ URL: **/membership/**
 **No Payload required**
 
 ---
-##### Responose if SUCCESSFUL
+#### Response if SUCCESSFUL
 Status Code: 200 OK
 
 Content-Type: application/json
@@ -664,7 +685,7 @@ The array holds a set of dictionaries with the following attributes for each mem
 - **member** is your username
 
 ---
-#### CREATE MEMEBERSHIP
+### CREATE MEMBERSHIP
 Response Method: **POST**
 
 Content-Type: **application/json** or **multipart/form-data**
@@ -682,7 +703,7 @@ Fields:
 - **team** is the private key (ID) of the team that the user wants to join
 
 ---
-##### Response if SUCCESSFUL
+#### Response if SUCCESSFUL
 Status Code: 201 Created
 
 Content-Type: application/json
@@ -705,7 +726,7 @@ Fields:
 - **member** is your username
 
 ---
-#### QUIT MEMBERSHIP
+### QUIT MEMBERSHIP
 Request Method: **DELETE**
 
 URL: **/leave/team/<int:team_id>**
@@ -713,11 +734,11 @@ URL: **/leave/team/<int:team_id>**
 **No Payload required**
 
 ---
-##### Response if SUCCESSFUL
+#### Response if SUCCESSFUL
 Status Code: 204 No Content
 
 ---
-##### Response if NOT ALLOWED or NOT FOUND
+#### Response if NOT ALLOWED or NOT FOUND
 Status Code: 404 Not Found
 
 Conent-Type: application/json
@@ -730,21 +751,21 @@ Body:
 </code>
 
 ---
-### Team Chat
+## Team Chat
 
-#### LIST OF MESSAGES
+### LIST OF MESSAGES
 Request-Method : **GET**
 
 UR: **/team-chat-list/**
 
-##### PARAMETERS
+#### PARAMETERS
 - **search** allows you to search for items by title, username of owner or due_date. For example, /tasks/?search=2023-09 will give you all tasks that are due in September 2023. /tasks/?search=tester will give a list that contains tasks whose title begins with tester or whose owners username begins with tester. However, it will only list either your own tasks or tasks that have been assigned to you by other users.
 - **team_id** the private key of the targeted team.
 - **minus_days**  Filter the messages to only contain messages that are older than minus_days. In other words, if minus_days equals to 5 then the query will only return the messages posted in the last 5 days
 - **limit** number of items per page (pagination)
 - **offset** starting with item number (pagination)
 
-##### Response if SUCCESSFUL
+#### Response if SUCCESSFUL
 Status Code: 200 OK
 
 Content-Type: application/json
@@ -797,12 +818,12 @@ The array holds a set of dictionaries with the following attributes for each Mes
 
 If **no team** with the given **id** is found, the **count** will be **zero**
 
-#### MESSAGE COUNT
+### MESSAGE COUNT
 Request Method: **GET**
 
 URL: **team-chat-message-count/<int:team_id>**
 
-##### Response if SUCCESSFUL
+#### Response if SUCCESSFUL
 Status Code: 200 OK
 
 Content-Type: application/json
@@ -817,7 +838,7 @@ Body:
 **count** is the total number of messages in the given team chat
 
 ---
-#### POST A MESSAGE
+### POST A MESSAGE
 Request Method: **POST**
 
 Content-Type: **application/json** or **multipart/form-data**
@@ -837,7 +858,7 @@ Body:
 **NOTE! Use form-data if you want to upload an image file in the request**
 
 
-##### Response if SUCCESSFUL
+#### Response if SUCCESSFUL
 Status Code: **201 CREATED**
 
 Content-Type: **application/json**
@@ -855,7 +876,7 @@ Body:
 </code>
 
 ---
-#### UPDATE A MESSAGE
+### UPDATE A MESSAGE
 Request Method: **PUT**
 
 Content-Type: **application/json** or **multipart/form-data**
@@ -875,7 +896,7 @@ Body:
 **NOTE! Use form-data if you want to upload an image file in the request**
 
 
-##### Response if SUCCESSFUL
+#### Response if SUCCESSFUL
 Status Code: **200 OK**
 
 Content-Type: **application/json**
@@ -890,12 +911,12 @@ Body:
 </code>
 
 
-#### DELETE A MESSAGE
+### DELETE A MESSAGE
 Request Method: **DELETE**
 
 URL: **/team-chat-delete/<int:message_id>**
 
-##### Response if SUCCESSFUL
+#### Response if SUCCESSFUL
 Status Code: 200 OK
 
 Content-Type: **application/json**
@@ -907,7 +928,7 @@ Body:
 }
 </code>
 
-##### Response if no PERMISSION
+#### Response if no PERMISSION
 Status Code: 403 Forbidden
 
 Content-Type: **application/json**
@@ -920,18 +941,18 @@ Body:
 </code>
 
 ---
-##### Response if message NOT FOUND 
+#### Response if message NOT FOUND 
 Status Code: 404 NOT FOUND
 
 ---
-## Private Chat
+# Private Chat
 
-#### LIST OF MESSAGES
+### LIST OF MESSAGES
 Request-Method : **GET**
 
 UR: **/private-chat-list/**
 
-##### PARAMETERS
+#### PARAMETERS
 - **search** allows you to search for items by title, username of owner or due_date. For example, /tasks/?search=2023-09 will give you all tasks that are due in September 2023. /tasks/?search=tester will give a list that contains tasks whose title begins with tester or whose owners username begins with tester. However, it will only list either your own tasks or tasks that have been assigned to you by other users.
 - **team_id** the private key of the targeted team.
 - **from_user_id** the private key of the private chat member (who the messages were sent to or from)
@@ -939,7 +960,7 @@ UR: **/private-chat-list/**
 - **limit** number of items per page (pagination)
 - **offset** starting with item number (pagination)
 
-##### Response if SUCCESSFUL
+#### Response if SUCCESSFUL
 Status Code: 200 OK
 
 Content-Type: application/json
@@ -988,14 +1009,14 @@ The array holds a set of dictionaries with the following attributes for each Mes
 If **no team** with the given **id** is found, the **count** will be **zero**
 
 ---
-#### MESSAGE COUNT (Private Chat)
+### MESSAGE COUNT (Private Chat)
 Request Method: **GET**
 
 URL: **private-chat-message-count/<int:team_id>/<int:recipient_id>**
 
 **recipient_id** signifies the user with whom the messages were exchanged
 
-##### Response if SUCCESSFUL
+#### Response if SUCCESSFUL
 Status Code: 200 OK
 
 Content-Type: application/json
@@ -1010,7 +1031,7 @@ Body:
 **count** is the total number of messages in the given team chat
 
 ---
-#### POST A MESSAGE (Private Chat)
+### POST A MESSAGE (Private Chat)
 Request Method: **POST**
 
 Content-Type: **application/json** or **multipart/form-data**
@@ -1030,7 +1051,7 @@ Body:
 **NOTE! Use form-data if you want to upload an image file in the request**
 
 
-##### Response if SUCCESSFUL
+#### Response if SUCCESSFUL
 Status Code: **201 CREATED**
 
 Content-Type: **application/json**
@@ -1049,7 +1070,7 @@ Body:
 </code>
 
 ---
-#### UPDATE A MESSAGE (Private Chat)
+### UPDATE A MESSAGE (Private Chat)
 Request Method: **PUT**
 
 Content-Type: **application/json** or **multipart/form-data**
@@ -1069,7 +1090,7 @@ Body:
 **NOTE! Use form-data if you want to upload an image file in the request**
 
 
-##### Response if SUCCESSFUL
+#### Response if SUCCESSFUL
 Status Code: **200 OK**
 
 Content-Type: **application/json**
@@ -1084,12 +1105,12 @@ Body:
 </code>
 
 
-#### DELETE A MESSAGE (Private Chat)
+### DELETE A MESSAGE (Private Chat)
 Request Method: **DELETE**
 
 URL: **/private-chat-delete/<int:message_id>**
 
-##### Response if SUCCESSFUL
+#### Response if SUCCESSFUL
 Status Code: 200 OK
 
 Content-Type: **application/json**
@@ -1101,7 +1122,7 @@ Body:
 }
 </code>
 
-##### Response if no PERMISSION
+#### Response if no PERMISSION
 Status Code: 403 Forbidden
 
 Content-Type: **application/json**
@@ -1114,19 +1135,19 @@ Body:
 </code>
 
 ---
-##### Response if message NOT FOUND 
+#### Response if message NOT FOUND 
 Status Code: 404 NOT FOUND
 
 
 ---
-#### LIST OF TASKS 
+### LIST OF TASKS 
 Request Method: **GET**
 
 URL:  **/tasks/**
 
 **No Payload required**
 
-##### PARAMETERS
+#### PARAMETERS
 - **search** allows you to search for items by title, username of owner or due_date. For example, /tasks/?search=2023-09 will give you all tasks that are due in September 2023. /tasks/?search=tester will give a list that contains tasks whose title begins with tester or whose owners username begins with tester. However, it will only list either your own tasks or tasks that have been assigned to you by other users.
 - **ordering** allows you to order the results by due_date, priority or status. For example: /tasks/?ordering=priority will give you a list that is ordered by priority in ascending order. To order it in descending order add a **-** after **=**, like so &ordering=-priority.
 - **owner, due_date, category, priority, status** any one of these parameters can be used to filter the results. For instance, /tasks/?owner=tester?category=0 will give you all Chores of the user tester, provided that the user has assigend any tasks to you.
@@ -1134,7 +1155,7 @@ URL:  **/tasks/**
 **NOTE! due_date is a datetime object so it expects a specific time. It is useless when it comes to filtering out tasks that belong to a specific day. For that purpose it is better to use the search filter as shown in the example above.**
 
 ---
-##### Response if SUCCESSFUL
+#### Response if SUCCESSFUL
 Status Code: 200 OK
 
 Content-Type: application/json
@@ -1207,7 +1228,7 @@ The array holds a set of dictionaries with the following attributes for each Tas
 - **file** URL of a image file that was attached to the task or **null**
 
 ---
-#### CREATE TASK
+### CREATE TASK
 Request Method: **POST**
 
 Content-Type: **application/json** or **multipart/form-data**
@@ -1242,7 +1263,7 @@ Fields:
 **NOTE! Use form-data if you want to upload an image file in the request**
 ---
 
-##### Response if SUCCESSFUL
+#### Response if SUCCESSFUL
 Status Code: 200 OK
 
 Context-Type: application/json
@@ -1265,7 +1286,7 @@ Body:
 </code>
 
 ---
-##### Response if VALIDATION ERRORS
+#### Response if VALIDATION ERRORS
 **The response will return a jason file that contains the field name that failed validation and an array of possible reasons**
 
 Status-Code: 400 Bad Request
@@ -1282,7 +1303,7 @@ Body:
 </code>
 
 ---
-#### RETRIEVE TASK BY ID
+### RETRIEVE TASK BY ID
 Request Method: **GET**
 
 URL: **/task/<int:pk>** pk is the private key (ID) of the task 
@@ -1290,7 +1311,7 @@ URL: **/task/<int:pk>** pk is the private key (ID) of the task
 **No Payload required**
 
 ---
-##### Response if SUCCESSFUL
+#### Response if SUCCESSFUL
 Status Code: 200 OK
 
 Content-Type: application/json
@@ -1329,7 +1350,7 @@ The data in the Response will have the follwing fields:
 If the task is not found the **Response** will have the status **400** Bad Request
 
 ---
-##### UPDATE TASK BY ID
+#### UPDATE TASK BY ID
 Request Method: **PUT**
 
 Content-Type: **application/json** or **multipart/form-data**
@@ -1367,7 +1388,7 @@ The **required fields**, which are title, due_date, category, priority and statu
 If the task is not found the **Response** will have the status **400** Bad Request
 
 ---
-#### DELETE TASK BY ID
+### DELETE TASK BY ID
 Request Method: **DELETE**
 
 URL: **/task/<int:pk>** pk is the private key (ID) of the task
@@ -1375,31 +1396,31 @@ URL: **/task/<int:pk>** pk is the private key (ID) of the task
 **No Payload required**
 
 ---
-##### Response if DELETED
+#### Response if DELETED
 Status-Code: 204 No Content
 ---
-##### Response if NOT FOUND
+#### Response if NOT FOUND
 Status Code: 404 Not found
 ---
-## Tests
-### Authentication
+# Tests
+## Authentication
 Authentication has been tested by using the Views provided by DRF.
 Also, the application uses dj-rest-auth. Which is a well tested app.
 But it seems that this version does have a few bugs, whose fix was
 provided by Code Institute and can be found in organizer_api_prj.views.py
 ---
-#### Registration
+### Registration
 - I have registered several users.
 - The validation works.
 - The users are added as expected.
 ---
-#### Login
+### Login
 - Users can sign in
 - The validation works.
 
 
 ---
-### Test Listing Tasks
+## Test Listing Tasks
 As a **User** I can **retrieve a list their own tasks** so that **the front end can display them**
 - [x] Tasks list only contains tasks that either belong to the user or have been assigned to the user
 - [x] Task list can be ordered by due_date, title
@@ -1407,50 +1428,50 @@ As a **User** I can **retrieve a list their own tasks** so that **the front end 
 - [x] Task list can be filtered by due_date
 - [x] Tasks are serialized in JSON format
 
-### Test Creating Tasks
+## Test Creating Tasks
 As an **authenticated user** I can **create tasks**
 - [x] The current user becomes the owner of the task
 - [x] Task fields are validated
 - [x] The created task reflects the submitted Task
 
-### Test Deleting Tasks
+## Test Deleting Tasks
 As a **authenticated user** I can **delete tasks** 
 - [x] Tasks can be deleted by the owner
 - [x] Task can be deleted by the assigned teammate
 
-### Test Updating Tasks
+## Test Updating Tasks
 As an **authenticated user** I can **update tasks**
 - [x] The updated task reflects the submitted data 
 - [x] Access granted only to the owner or a teammate, to whom the task was assigned
 
-### Test Listing Teams
+## Test Listing Teams
 As a **authenticated user** I can **retrieve a list of teams**
 - [x] All teams are listed
 - [x] Teams can be filtered by username
 
-### Test creating Teams
+## Test creating Teams
 As a **authenticated user** I can **create teams** 
 - [x] User can create a team
 - [x] User creating the team is made the owner of the team
 - [x] The created team reflects the submitted data
 - [x] The same team cannot be created twice (team.owner + team.name) must be unique
 
-### Test updating Teams
+## Test updating Teams
 As an **atuhenticated user** and owner of the team I can **update teams**
 - [x] The team is updated correctly
 - [x] The validation works
 
-### Test joining Teams
+## Test joining Teams
 As a **authenticated user** I can **join other teams**
 - [x] Membership entry is created correctly - your user becomes member of the targeted team
 - [x] Membership allows team owners to assign a task to you as a teammate
 
-### Test leaving Teams
+## Test leaving Teams
 As a **authenticated user** I can **leave teams**
 - [x] Upon leaving a team, the team owner cannot assign tasks to the user
 - [x] The membership entry is deleted
 
-### Test Listing Tasks
+## Test Listing Tasks
 As a **User** I can **retrieve a list their own tasks** so that **the front end can display them**
 - [x] Tasks list only contains tasks that either belong to the user or have been assigned to the user
 - [x] Task list can be ordered by due_date, title
@@ -1458,55 +1479,55 @@ As a **User** I can **retrieve a list their own tasks** so that **the front end 
 - [x] Task list can be filtered by due_date
 - [x] Tasks are serialized in JSON format
 
-### Test Creating Tasks
+## Test Creating Tasks
 As an **authenticated user** I can **create tasks**
 - [x] The current user becomes the owner of the task
 - [x] Task fields are validated
 - [x] The created task reflects the submitted Task
 
-### Test Deleting Tasks
+## Test Deleting Tasks
 As a **authenticated user** I can **delete tasks** 
 - [x] Tasks can be deleted by the owner
 - [x] Task can be deleted by the assigned teammate
 
-### Test Updating Tasks
+## Test Updating Tasks
 As an **authenticated user** I can **update tasks**
 - [x] The updated task reflects the submitted data 
 - [x] Access granted only to the owner or a teammate, to whom the task was assigned
 
-### Test Listing Teams
+## Test Listing Teams
 As a **authenticated user** I can **retrieve a list of teams**
 - [x] All teams are listed
 - [x] Teams can be filtered by username
 - [x] Teams can be filtered by title(team name)
 
-### Test creating Teams
+## Test creating Teams
 As a **authenticated user** I can **create teams** 
 - [x] User can create a team
 - [x] User creating the team is made the owner of the team
 - [x] The created team reflects the submitted data
 - [x] The same team cannot be created twice (team.owner + team.name) must be unique
 
-### Test updating Teams
+## Test updating Teams
 As an **atuhenticated user** and owner of the team I can **update teams**
 - [x] The team is updated correctly
 - [x] The validation works
 
-### Test joining Teams
+## Test joining Teams
 As a **authenticated user** I can **join other teams**
 - [x] Membership entry is created correctly - your user becomes member of the targeted team
 - [x] Membership allows team owners to assign a task to you as a teammate
 
-### Test leaving Teams
+## Test leaving Teams
 As a **authenticated user** I can **leave teams**
 - [x] Upon leaving a team, the team owner cannot assign tasks to the user
 - [x] The membership entry is deleted
 
 ---
-## Deployment
+# Deployment
 To deploy this application it is required to set environment variables that it uses.
 
-### Cloudinary account
+## Cloudinary account
 If you register with Cloudinary, you will get a URL that can be used for storing files.
 
 **CLOUDINARY_URL** = 'cloudinary://long-string-of-mumbo-jumbo'
@@ -1529,7 +1550,7 @@ and **MEDIA_ROOT** and **MEDIA_URL** specified. The former is the **absolute pat
 machine running the script and the latter is the **URL** that must be used in the requests 
 for the files.
 
-### Database settings
+## Database settings
 The application uses a django.db.backends.postgresql_psycopg2 engine, so it does expect the DBMS to be PostgresSQL.
 Here is the code-snippet from settings.py
 <code>
@@ -1551,17 +1572,17 @@ DATABASES = {
 </code>
 
 However, you can use any other engine. Only in that case, you will have to override this part in settings.py.
-And use the settings dictated by the vondor of the engine. Which I am sure will not differ by much from the ones
+And use the settings dictated by the vendor of the engine. Which I am sure will not differ by much from the ones
 that you see above.
 
-Here is the set of varaibles used by this application:
+Here is the set of variables used by this application:
 **DB_NAME** = name of the database
 **DB_USER** = name of the user that has access to the database
 **DB_PASSWORD** = the password
 **DB_HOST** = either the IP of the host or hostname(Domain)
 **DB_PORT** = the port number
 
-### Client origin
+## Client origin
 **CLIENT_ORIGIN** = URL at which the Front end was deployed
 This setting is required by django-cors-headers, which is a Django application 
 for handling the server headers required for Cross-Origin Resource Sharing (CORS).
@@ -1575,23 +1596,24 @@ Here is a code-snippet from settings.py:
     ]
 </code>
 
-### Secret key
+## Secret key
 **SECRET_KEY** = some random string of characters that will be used as a secret key for encryption
 
-### Debugging
+## Debugging
 In order to use the views for debugging you can set 
 DEV = "1"
-#### To turn the debugging mode back off
+
+### To turn the debugging mode back off
 Just remove the variable all together
 
-In the deployed version, it can be switched on and off. But must be removed for comercial 
+In the deployed version, it can be switched on and off. But must be removed for commercial 
 deployment.
 
-#### ALLOWED_HOSTS
+### ALLOWED_HOSTS
 In settings.py there is an array that is called ALLOWED_HOSTS. It is necessary that the **hostname or IP** be added to that array.
 
 ---
-#### Deployment on heroku
+### Deployment on heroku
 To deploy the application on heroku, the **requirements.txt** must be in the folder.
 The **Procfile** must be in place and contain this code:
 
@@ -1600,10 +1622,48 @@ The **Procfile** must be in place and contain this code:
  web: gunicorn organizer_api_prj.wsgi
 </code>
 
-The Procfile is used for initializing the application every time it is deployed.
-The code above states that before deployment the comands makemigrations and then migrate must be executed.
-It also tells the gunicorn server the name of the WSGI file, which is a python script file that instanciates this application in WSGI-mode.
 
-The **variables** mentioned above translate to **ConfigVars** on heroku. Those can be found in **Settings** Tab
-of the deployed app. As soon as all of those variables are set to **valid values** it can be deployed.
-On heroku just go to **Deploy** Tab and click on the button that reads **'Deploy'**
+---
+Go to heroku
+---
+
+1.) Go to the dashboard on heroku and click on new -> Create new app
+![Create new app on heroku](images/heroku/new.png)
+
+---
+
+2.)
+- Enter app name
+- Choose region
+- Click on Create app
+
+![Enter app name and region](images/heroku/new_1.png)
+
+---
+
+3.)
+- Choose GitHub for Deployment Method
+- Enter name of repository in the Connect to GitHub section
+- Click on Connect
+
+![Choose your GitHub repo](images/heroku/new_2.png)
+
+---
+
+4.)Go to Settings and scroll down to ConfigVars
+
+![Open Settings](images/heroku/settings_1.png)
+
+---
+
+5.)Click on Reveal ConfigVars in the ConfigVars section and add values to the variables
+
+![Reveal ConfigVars](iamges/../images/heroku/settings_2.png)
+
+---
+
+7.)Go to Deploy and scroll down to the Manual Deploy section and click on Deploy branch
+
+![Deploy](images/heroku/deploy_1.png)
+
+---
