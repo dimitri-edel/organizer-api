@@ -1,6 +1,144 @@
 # ORGANIZER API
 
-The API allows a front end application to store and access data for a basic organizer.
+The API allows a front end application to store and access data for a basic organizer with a chat function.
+
+
+- [ORGANIZER API](#organizer-api)
+- [FRONTEND REPOSITORY](#frontend-repository)
+- [FEATURES](#features)
+- [Authentication](#authentication)
+  - [Forming Teams](#forming-teams)
+  - [Task Management](#task-management)
+  - [Team Chat](#team-chat)
+  - [Private Chat](#private-chat)
+  - [PEP8 and Pylint](#pep8-and-pylint)
+  - [ISSUES](#issues)
+- [MODEL](#model)
+  - [Setting up a database for the project](#setting-up-a-database-for-the-project)
+  - [Adding database to settings.py](#adding-database-to-settingspy)
+- [URL ROUTES FOR REQUESTS](#url-routes-for-requests)
+  - [Authentication](#authentication-1)
+    - [REGISTRATION](#registration)
+      - [Response if SUCCESSFUL](#response-if-successful)
+      - [ERROR User already exists](#error-user-already-exists)
+      - [ERROR Password validation errors](#error-password-validation-errors)
+    - [LOGIN](#login)
+      - [Response if SUCCESSFUL](#response-if-successful-1)
+      - [Response if no password was provided](#response-if-no-password-was-provided)
+      - [Response if the username and password do not exist](#response-if-the-username-and-password-do-not-exist)
+    - [LOGOUT](#logout)
+    - [USER AND ACCESS TOKENS](#user-and-access-tokens)
+      - [Response if SUCCESSFUL](#response-if-successful-2)
+      - [Response if NOT LOGGED IN](#response-if-not-logged-in)
+    - [REFRESH ACCESS TOKENS](#refresh-access-tokens)
+      - [Response if NOT LOGGED IN](#response-if-not-logged-in-1)
+      - [Response if SUCCESSFUL](#response-if-successful-3)
+  - [Team app](#team-app)
+  - [**The following URLs will only work for authenticated users!**](#the-following-urls-will-only-work-for-authenticated-users)
+    - [LIST OF TEAMS](#list-of-teams)
+      - [PARAMETERS](#parameters)
+      - [Response](#response)
+    - [LIST OF TEAM-MEMBERS](#list-of-team-members)
+      - [Response if SUCCESSFUL](#response-if-successful-4)
+      - [Response if no PERMISSION](#response-if-no-permission)
+    - [TEAM MEMBER'S COUNT](#team-members-count)
+      - [Response if SUCCESSFUL](#response-if-successful-5)
+    - [CREATE NEW TEAM](#create-new-team)
+      - [Response if SUCCESSFUL](#response-if-successful-6)
+      - [Response if NAME FIELD IS EMPTY](#response-if-name-field-is-empty)
+    - [RETRIEVE TEAM](#retrieve-team)
+      - [Response if SUCCESSFUL](#response-if-successful-7)
+        - [Response if NOT FOUND](#response-if-not-found)
+    - [UPDATE TEAM](#update-team)
+      - [Response if SUCCESSFUL](#response-if-successful-8)
+      - [Response if NAME FIELD IS EMPTY](#response-if-name-field-is-empty-1)
+    - [DELETE TEAM](#delete-team)
+      - [Response if SUCCESSFUL](#response-if-successful-9)
+        - [Response if NOT FOOUND](#response-if-not-foound)
+    - [LIST OF TEAMMATES](#list-of-teammates)
+      - [Response if SUCCESSFUL](#response-if-successful-10)
+    - [LIST OF TEAM MEMBERSHIPS](#list-of-team-memberships)
+      - [Response if SUCCESSFUL](#response-if-successful-11)
+    - [CREATE MEMBERSHIP](#create-membership)
+      - [Response if SUCCESSFUL](#response-if-successful-12)
+    - [QUIT MEMBERSHIP](#quit-membership)
+      - [Response if SUCCESSFUL](#response-if-successful-13)
+      - [Response if NOT ALLOWED or NOT FOUND](#response-if-not-allowed-or-not-found)
+  - [Team Chat](#team-chat-1)
+    - [LIST OF MESSAGES](#list-of-messages)
+      - [PARAMETERS](#parameters-1)
+      - [Response if SUCCESSFUL](#response-if-successful-14)
+    - [MESSAGE COUNT](#message-count)
+      - [Response if SUCCESSFUL](#response-if-successful-15)
+    - [POST A MESSAGE](#post-a-message)
+      - [Response if SUCCESSFUL](#response-if-successful-16)
+    - [UPDATE A MESSAGE](#update-a-message)
+      - [Response if SUCCESSFUL](#response-if-successful-17)
+  - [Response if the team field or message field is missing](#response-if-the-team-field-or-message-field-is-missing)
+    - [DELETE A MESSAGE](#delete-a-message)
+      - [Response if SUCCESSFUL](#response-if-successful-18)
+      - [Response if no PERMISSION](#response-if-no-permission-1)
+      - [Response if message NOT FOUND](#response-if-message-not-found)
+  - [Private Chat](#private-chat-1)
+    - [LIST OF MESSAGES](#list-of-messages-1)
+      - [PARAMETERS](#parameters-2)
+      - [Response if SUCCESSFUL](#response-if-successful-19)
+    - [MESSAGE COUNT (Private Chat)](#message-count-private-chat)
+      - [Response if SUCCESSFUL](#response-if-successful-20)
+    - [POST A MESSAGE (Private Chat)](#post-a-message-private-chat)
+      - [Response if SUCCESSFUL](#response-if-successful-21)
+    - [UPDATE A MESSAGE (Private Chat)](#update-a-message-private-chat)
+      - [Response if SUCCESSFUL](#response-if-successful-22)
+    - [DELETE A MESSAGE (Private Chat)](#delete-a-message-private-chat)
+      - [Response if SUCCESSFUL](#response-if-successful-23)
+      - [Response if no PERMISSION](#response-if-no-permission-2)
+      - [Response if message NOT FOUND](#response-if-message-not-found-1)
+    - [LIST OF TASKS](#list-of-tasks)
+      - [PARAMETERS](#parameters-3)
+      - [Response if SUCCESSFUL](#response-if-successful-24)
+    - [CREATE TASK](#create-task)
+  - [**NOTE! Use form-data if you want to upload an image file in the request**](#note-use-form-data-if-you-want-to-upload-an-image-file-in-the-request)
+      - [Response if SUCCESSFUL](#response-if-successful-25)
+      - [Response if VALIDATION ERRORS](#response-if-validation-errors)
+    - [RETRIEVE TASK BY ID](#retrieve-task-by-id)
+      - [Response if SUCCESSFUL](#response-if-successful-26)
+      - [UPDATE TASK BY ID](#update-task-by-id)
+  - [Test summary](#test-summary)
+    - [DELETE TASK BY ID](#delete-task-by-id)
+  - [Test summary](#test-summary-1)
+      - [Response if DELETED](#response-if-deleted)
+  - [Status-Code: 204 No Content](#status-code-204-no-content)
+      - [Response if NOT FOUND](#response-if-not-found-1)
+  - [Status Code: 404 Not found](#status-code-404-not-found)
+- [TEST SUMMARIES](#test-summaries)
+  - [Authentication](#authentication-2)
+  - [provided by Code Institute and can be found in organizer\_api\_prj.views.py](#provided-by-code-institute-and-can-be-found-in-organizer_api_prjviewspy)
+    - [Registration](#registration-1)
+  - [Test Details](#test-details)
+    - [Login](#login-1)
+  - [Test Details](#test-details-1)
+  - [Test Listing Tasks](#test-listing-tasks)
+  - [Test Creating Tasks](#test-creating-tasks)
+  - [Test Deleting Tasks](#test-deleting-tasks)
+  - [Test Updating Tasks](#test-updating-tasks)
+  - [Test Listing Teams](#test-listing-teams)
+  - [Test creating Teams](#test-creating-teams)
+  - [Test updating Teams](#test-updating-teams)
+  - [Test joining Teams](#test-joining-teams)
+  - [Test leaving Teams](#test-leaving-teams)
+  - [Test Listing Team Chat messages](#test-listing-team-chat-messages)
+  - [Test Posting Team Chat Messages](#test-posting-team-chat-messages)
+  - [Test Updating Team Chat Messages](#test-updating-team-chat-messages)
+- [Deployment](#deployment)
+  - [Cloudinary account](#cloudinary-account)
+  - [Database settings](#database-settings)
+  - [Client origin](#client-origin)
+  - [Secret key](#secret-key)
+  - [Debugging](#debugging)
+    - [To turn the debugging mode back off](#to-turn-the-debugging-mode-back-off)
+    - [ALLOWED\_HOSTS](#allowed_hosts)
+    - [Deployment on heroku](#deployment-on-heroku)
+  - [Go to heroku](#go-to-heroku)
 
 # FRONTEND REPOSITORY
 [Open Frontend Repository](https://github.com/dimitri-edel/organizer-react)
@@ -49,10 +187,12 @@ Users who are members of a Team can exchange private messages in a Private Chat 
 - [get a total number of messages](#message-count-private-chat)
 
 
-## 
-
 ## PEP8 and Pylint
 For linting the code I used pylint to validate the code. Thus, it is mandatory that Pylint be used to validate the code on another machine, because it was necessary to apply a few instructions for that tool in the code. For instance, it does not recognize dynamically attached properties and will throw an error, even if the property is valid.
+
+
+## ISSUES
+A copy of **env.py** with **credentials** was pushed to the repository in the beginning, because I forgot to add it to gitignore. The file itself is gone, but a binary file with the extension **pyc** is still there. I have tried to remove it with **filter-branch** but it wouldn't work. So I contacted a tutor and he told me to change the credentials and mention it in the readme file. As a result, I have changed the credentials and the ones in the file are not valid.
 
 ---
 
@@ -63,6 +203,68 @@ Here is a sketch of how the model types are related to each other.
 
 ---
 
+## Setting up a database for the project
+For this Project I have decided to use an external database on one of the servers that I rent. It is a PostgreSQL Server with pgAdmin as a Management Tool. In order to set up a new database I need to first log in to pgAdmin.
+
+![Login in to pg-Admin](images/pg_admin/pg_admin_login.png)
+
+Then I need to create a database.
+
+![Create database](images/pg_admin/pg_admin_create_database_1.png)
+
+Next I need to name the database and assign a user as its owner. In other words, a user that can edit the database. I already have a user for this app, so I just need to select him from a dropdown menu. In this case the username is heroku-organizer-backend(not the actual name though) and they have all the privileges that are necessary for editing this database.
+
+![Name database](images/pg_admin/pg_admin_create_database_2.png)
+
+Now the database is ready to be used. At least for django it is, because django will automatically map the models to this database when the manage.py migrate script is executed. Alongside all the models that I will define in the scope of this project, django will also map models from other apps that I am going to use in this project, such as django-allauth, the users for django.contrib.auth and so on.
+
+![Database ready](images/pg_admin/pg_admin_save_databse.png)
+
+
+
+
+## Adding database to settings.py
+First of all, since I am going to store the project on GitHub, I cannot publicly share the credentials used for the database. So I will store them in a file that will be added to gitignore. In settings.py I will only use variables that correspond to the credentials.
+
+I need to import the environment variables that I defined in env.py. Since, I am using a wildcard-import from .env import * I need to let the linter know that it is fine. I am doing that because there are no classes defined in that file only a number of os.eniron assignments. Which you can see as a setting for pylint in form of a comment: # pylint: disable=wildcard-import Also,I need to override the standard SQLite engine setting in settings.py by providing my set of settings:
+
+<code>
+
+\#pylint: disable=wildcard-import
+from pathlib import Path
+import os
+if os.path.exists('organizer_api_prj/env.py'):
+from .env import *
+
+</code>
+
+
+<code>
+DATABASES = {
+
+
+    "default": {
+
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+
+        'NAME': os.environ['DB_NAME'],
+
+        'USER': os.environ['DB_USER'],
+
+        'PASSWORD': os.environ['DB_PASSWORD'],
+
+        'HOST': os.environ['DB_HOST'],
+
+        'PORT': os.environ['DB_PORT'],
+    }
+}
+
+</code>
+
+Now, when the models are already in place, one must run **manage.py makemigrations** and then **manage.py migrate**
+
+The environment variables for the database above are the ones that will later translate to the **ConfigVars** on **heroku**.
+
 # URL ROUTES FOR REQUESTS
 
 All of the following URLs must be appended to the **ROOT URL** of the API.
@@ -71,7 +273,9 @@ All of the following URLs must be appended to the **ROOT URL** of the API.
 ## Authentication
 
 ### REGISTRATION
----
+
+[Test summary](#registration-1)
+
 Request Method: **POST**
 
 Content-Type: **application/json** or **multipart/form-data***
@@ -152,7 +356,9 @@ If password1 and password2 don't match the Body will look like this:
 ---
 
 ### LOGIN
----
+
+[Test summary](#login-1)
+
 Request Method: **POST**
 
 Content-Type: **application/json** or **multipart/form-data***
@@ -308,6 +514,9 @@ Body:
 **The following URLs will only work for authenticated users!**
 ---
 ### LIST OF TEAMS
+
+[Test summary](#test-listing-teams)
+
 Request Method: **GET**
 
 URL: **/team/**
@@ -423,6 +632,10 @@ Body:
 
 ---
 ### CREATE NEW TEAM
+
+[Test summary](#test-creating-teams)
+
+
 Request Method **POST**
 
 Content-Type: **application/json** or **multipart/form-data**
@@ -518,6 +731,10 @@ Body:
 
 ---
 ### UPDATE TEAM
+
+[Test summary](#test-updating-teams)
+
+
 Request Method: **PUT**
 
 URL:  **/team/<int:pk>/** pk is the private key of the team, which is an integer value
@@ -686,6 +903,10 @@ The array holds a set of dictionaries with the following attributes for each mem
 
 ---
 ### CREATE MEMBERSHIP
+
+[Test summary](#test-joining-teams)
+
+
 Response Method: **POST**
 
 Content-Type: **application/json** or **multipart/form-data**
@@ -727,6 +948,10 @@ Fields:
 
 ---
 ### QUIT MEMBERSHIP
+
+[Test summary](#test-leaving-teams)
+
+
 Request Method: **DELETE**
 
 URL: **/leave/team/<int:team_id>**
@@ -754,6 +979,10 @@ Body:
 ## Team Chat
 
 ### LIST OF MESSAGES
+
+[Test summary](#test-listing-team-chat-messages)
+
+
 Request-Method : **GET**
 
 UR: **/team-chat-list/**
@@ -839,6 +1068,10 @@ Body:
 
 ---
 ### POST A MESSAGE
+
+[Test summary](#test-posting-team-chat-messages)
+
+
 Request Method: **POST**
 
 Content-Type: **application/json** or **multipart/form-data**
@@ -877,6 +1110,10 @@ Body:
 
 ---
 ### UPDATE A MESSAGE
+
+[Test summary](#test-updating-team-chat-messages)
+
+
 Request Method: **PUT**
 
 Content-Type: **application/json** or **multipart/form-data**
@@ -910,6 +1147,19 @@ Body:
 }
 </code>
 
+## Response if the team field or message field is missing
+Status-Code: **400 Bad Request**
+
+Content-type: **application/json**
+
+Body:
+<code>
+{
+    "message": [
+        "This field is required."
+    ]
+}
+</code>
 
 ### DELETE A MESSAGE
 Request Method: **DELETE**
@@ -945,7 +1195,7 @@ Body:
 Status Code: 404 NOT FOUND
 
 ---
-# Private Chat
+## Private Chat
 
 ### LIST OF MESSAGES
 Request-Method : **GET**
@@ -1007,6 +1257,8 @@ The array holds a set of dictionaries with the following attributes for each Mes
 **image**: URL of an image or null
 
 If **no team** with the given **id** is found, the **count** will be **zero**
+
+
 
 ---
 ### MESSAGE COUNT (Private Chat)
@@ -1141,6 +1393,8 @@ Status Code: 404 NOT FOUND
 
 ---
 ### LIST OF TASKS 
+[Test summary](#test-listing-tasks)
+
 Request Method: **GET**
 
 URL:  **/tasks/**
@@ -1229,6 +1483,8 @@ The array holds a set of dictionaries with the following attributes for each Tas
 
 ---
 ### CREATE TASK
+[Test summary](#test-creating-tasks)
+
 Request Method: **POST**
 
 Content-Type: **application/json** or **multipart/form-data**
@@ -1351,6 +1607,9 @@ If the task is not found the **Response** will have the status **400** Bad Reque
 
 ---
 #### UPDATE TASK BY ID
+---
+[Test summary](#test-updating-tasks)
+---
 Request Method: **PUT**
 
 Content-Type: **application/json** or **multipart/form-data**
@@ -1389,6 +1648,9 @@ If the task is not found the **Response** will have the status **400** Bad Reque
 
 ---
 ### DELETE TASK BY ID
+---
+[Test summary](#test-deleting-tasks)
+---
 Request Method: **DELETE**
 
 URL: **/task/<int:pk>** pk is the private key (ID) of the task
@@ -1402,7 +1664,9 @@ Status-Code: 204 No Content
 #### Response if NOT FOUND
 Status Code: 404 Not found
 ---
-# Tests
+# TEST SUMMARIES
+The tests were carried out with Postman (Software for testing APIs). The URL routes above contain the testing details. All the documented routs with request data were sent to the API and the responses are documented in test details. Each summary has a **link** to the test **details**.
+
 ## Authentication
 Authentication has been tested by using the Views provided by DRF.
 Also, the application uses dj-rest-auth. Which is a well tested app.
@@ -1410,17 +1674,26 @@ But it seems that this version does have a few bugs, whose fix was
 provided by Code Institute and can be found in organizer_api_prj.views.py
 ---
 ### Registration
+---
+[Test Details](#registration)
+---
 - I have registered several users.
 - The validation works.
 - The users are added as expected.
 ---
 ### Login
+---
+[Test Details](#login)
+---
 - Users can sign in
 - The validation works.
 
 
 ---
 ## Test Listing Tasks
+
+[Test Details](#list-of-tasks)
+
 As a **User** I can **retrieve a list their own tasks** so that **the front end can display them**
 - [x] Tasks list only contains tasks that either belong to the user or have been assigned to the user
 - [x] Task list can be ordered by due_date, title
@@ -1429,27 +1702,44 @@ As a **User** I can **retrieve a list their own tasks** so that **the front end 
 - [x] Tasks are serialized in JSON format
 
 ## Test Creating Tasks
+
+[Test Details](#create-task)
+
 As an **authenticated user** I can **create tasks**
 - [x] The current user becomes the owner of the task
 - [x] Task fields are validated
 - [x] The created task reflects the submitted Task
 
 ## Test Deleting Tasks
+
+[Test Details](#delete-task-by-id)
+
 As a **authenticated user** I can **delete tasks** 
 - [x] Tasks can be deleted by the owner
 - [x] Task can be deleted by the assigned teammate
 
 ## Test Updating Tasks
+
+[Test Details](#update-task-by-id)
+
 As an **authenticated user** I can **update tasks**
 - [x] The updated task reflects the submitted data 
 - [x] Access granted only to the owner or a teammate, to whom the task was assigned
 
 ## Test Listing Teams
+
+[Test Details](#list-of-teams)
+
+
 As a **authenticated user** I can **retrieve a list of teams**
 - [x] All teams are listed
 - [x] Teams can be filtered by username
 
 ## Test creating Teams
+
+[Test Details](#create-new-team)
+
+
 As a **authenticated user** I can **create teams** 
 - [x] User can create a team
 - [x] User creating the team is made the owner of the team
@@ -1457,71 +1747,62 @@ As a **authenticated user** I can **create teams**
 - [x] The same team cannot be created twice (team.owner + team.name) must be unique
 
 ## Test updating Teams
+
+[Test Details](#update-team)
+
+
 As an **atuhenticated user** and owner of the team I can **update teams**
 - [x] The team is updated correctly
 - [x] The validation works
 
 ## Test joining Teams
+
+[Test Details](#create-membership)
+
+
 As a **authenticated user** I can **join other teams**
 - [x] Membership entry is created correctly - your user becomes member of the targeted team
-- [x] Membership allows team owners to assign a task to you as a teammate
+- [x] Membership allows team owners to assign a task to a teammate
 
 ## Test leaving Teams
+
+[Test Details](#quit-membership)
+
+
 As a **authenticated user** I can **leave teams**
 - [x] Upon leaving a team, the team owner cannot assign tasks to the user
 - [x] The membership entry is deleted
 
-## Test Listing Tasks
-As a **User** I can **retrieve a list their own tasks** so that **the front end can display them**
-- [x] Tasks list only contains tasks that either belong to the user or have been assigned to the user
-- [x] Task list can be ordered by due_date, title
-- [x] Task can be searched by title, due_date
-- [x] Task list can be filtered by due_date
-- [x] Tasks are serialized in JSON format
 
-## Test Creating Tasks
-As an **authenticated user** I can **create tasks**
-- [x] The current user becomes the owner of the task
-- [x] Task fields are validated
-- [x] The created task reflects the submitted Task
+## Test Listing Team Chat messages
 
-## Test Deleting Tasks
-As a **authenticated user** I can **delete tasks** 
-- [x] Tasks can be deleted by the owner
-- [x] Task can be deleted by the assigned teammate
+[Test Details](#list-of-messages)
 
-## Test Updating Tasks
-As an **authenticated user** I can **update tasks**
-- [x] The updated task reflects the submitted data 
-- [x] Access granted only to the owner or a teammate, to whom the task was assigned
 
-## Test Listing Teams
-As a **authenticated user** I can **retrieve a list of teams**
-- [x] All teams are listed
-- [x] Teams can be filtered by username
-- [x] Teams can be filtered by title(team name)
+As a **member of a team** I can **receive a list of messages from the team chat room**
+- [x] Messages can be paginated
+- [x] The messages from the correct team are delivered
+- [x] Permissions work
+- [x] Filters work
 
-## Test creating Teams
-As a **authenticated user** I can **create teams** 
-- [x] User can create a team
-- [x] User creating the team is made the owner of the team
-- [x] The created team reflects the submitted data
-- [x] The same team cannot be created twice (team.owner + team.name) must be unique
+## Test Posting Team Chat Messages
 
-## Test updating Teams
-As an **atuhenticated user** and owner of the team I can **update teams**
-- [x] The team is updated correctly
-- [x] The validation works
+[Test Details](#post-a-message)
 
-## Test joining Teams
-As a **authenticated user** I can **join other teams**
-- [x] Membership entry is created correctly - your user becomes member of the targeted team
-- [x] Membership allows team owners to assign a task to you as a teammate
+- [x] Messages are posted as expected
+- [x] Permissions work (team members only)
 
-## Test leaving Teams
-As a **authenticated user** I can **leave teams**
-- [x] Upon leaving a team, the team owner cannot assign tasks to the user
-- [x] The membership entry is deleted
+## Test Updating Team Chat Messages
+
+[Test Details](#update-a-message)
+
+
+- [x] Messages can be updated as expected
+- [x] Permissions work (owners only)
+
+
+---
+
 
 ---
 # Deployment
